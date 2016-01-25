@@ -1,4 +1,4 @@
-package org.visallo.core.util;
+package org.visallo.core.concurrent;
 
 import org.visallo.core.exception.VisalloException;
 
@@ -13,9 +13,11 @@ import java.util.concurrent.Future;
 public class ExecutorServiceUtil {
     private static final ExecutorService pool = Executors.newCachedThreadPool();
 
+    @SafeVarargs
+    @SuppressWarnings("unchecked")
     public static <T> T[] runAllAndWait(Callable<T>... tasks) {
         try {
-            List<T> results = new ArrayList<T>(tasks.length);
+            List<T> results = new ArrayList<>(tasks.length);
             List<Future<T>> futures = pool.invokeAll(Arrays.asList(tasks));
             for (Future<T> future : futures) {
                 results.add(future.get());

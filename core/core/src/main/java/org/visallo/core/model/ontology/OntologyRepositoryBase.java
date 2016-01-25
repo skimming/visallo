@@ -39,7 +39,7 @@ import org.visallo.core.model.termMention.TermMentionRepository;
 import org.visallo.core.model.user.UserRepository;
 import org.visallo.core.model.workspace.WorkspaceRepository;
 import org.visallo.core.ping.PingOntology;
-import org.visallo.core.util.ExecutorServiceUtil;
+import org.visallo.core.concurrent.ExecutorServiceUtil;
 import org.visallo.core.util.JSONUtil;
 import org.visallo.core.util.VisalloLogger;
 import org.visallo.core.util.VisalloLoggerFactory;
