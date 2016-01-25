@@ -10,6 +10,7 @@ import org.vertexium.*;
 import org.vertexium.property.StreamingPropertyValue;
 import org.vertexium.util.IterableUtils;
 import org.visallo.core.bootstrap.InjectHelper;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.config.Configuration;
 import org.visallo.core.exception.VisalloException;
 import org.visallo.core.model.WorkQueueNames;
@@ -40,6 +41,7 @@ import static org.vertexium.util.IterableUtils.toList;
 public class GraphPropertyRunner extends WorkerBase {
     private static final VisalloLogger LOGGER = VisalloLoggerFactory.getLogger(GraphPropertyRunner.class);
     private final StatusRepository statusRepository;
+    private final ThreadRepository threadRepository;
     private Graph graph;
     private Authorizations authorizations;
     private List<GraphPropertyThreadedWrapper> workerWrappers = Lists.newArrayList();
@@ -54,10 +56,12 @@ public class GraphPropertyRunner extends WorkerBase {
     protected GraphPropertyRunner(
             WorkQueueRepository workQueueRepository,
             StatusRepository statusRepository,
+            ThreadRepository threadRepository,
             Configuration configuration
     ) {
         super(workQueueRepository, configuration);
         this.statusRepository = statusRepository;
+        this.threadRepository = threadRepository;
     }
 
     @Override
@@ -125,10 +129,7 @@ public class GraphPropertyRunner extends WorkerBase {
             GraphPropertyThreadedWrapper wrapper = new GraphPropertyThreadedWrapper(worker);
             InjectHelper.inject(wrapper);
             wrappers.add(wrapper);
-            Thread thread = new Thread(wrapper);
-            String workerName = worker.getClass().getName();
-            thread.setName("graphPropertyWorker-" + workerName);
-            thread.start();
+            threadRepository.startNonDaemon(wrapper, "graphPropertyWorker-" + worker.getClass().getName());
         }
 
         this.addGraphPropertyThreadedWrappers(wrappers);

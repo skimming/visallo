@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.vertexium.*;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.config.Configuration;
 import org.visallo.core.exception.VisalloException;
 import org.visallo.core.model.workQueue.WorkQueueRepository;
@@ -34,12 +35,15 @@ public class GraphPropertyRunnerTest {
     private static final String PROP_KEY = "propKey";
     private static final String PROP_VALUE = "propValue";
 
+    private static final ThreadRepository THREAD_REPOSITORY = ThreadRepository.withShortTimeout();
+
     private GraphPropertyRunner _testSubject;
     private Graph _graph;
 
     @Before
     public void before() {
-        _testSubject = new GraphPropertyRunner(mock(WorkQueueRepository.class), mock(StatusRepository.class), mock(Configuration.class));
+        _testSubject = new GraphPropertyRunner(mock(WorkQueueRepository.class), mock(StatusRepository.class),
+                THREAD_REPOSITORY, mock(Configuration.class));
         _graph = mock(Graph.class);
         _testSubject.setGraph(_graph);
     }

@@ -11,6 +11,7 @@ import org.vertexium.Property;
 import org.vertexium.Vertex;
 import org.vertexium.query.Compare;
 import org.vertexium.query.Query;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.model.properties.VisalloProperties;
 import org.visallo.core.model.user.UserRepository;
 import org.visallo.core.model.workQueue.Priority;
@@ -25,16 +26,19 @@ public class QueueVertices implements ParameterizedHandler {
     private final UserRepository userRepository;
     private final Graph graph;
     private final WorkQueueRepository workQueueRepository;
+    private final ThreadRepository threadRepository;
 
     @Inject
     public QueueVertices(
             UserRepository userRepository,
             Graph graph,
-            WorkQueueRepository workQueueRepository
+            WorkQueueRepository workQueueRepository,
+            ThreadRepository threadRepository
     ) {
         this.userRepository = userRepository;
         this.graph = graph;
         this.workQueueRepository = workQueueRepository;
+        this.threadRepository = threadRepository;
     }
 
     @Handle
@@ -54,7 +58,7 @@ public class QueueVertices implements ParameterizedHandler {
 
         final String finalConceptType = conceptType;
         final String finalPropertyName = propertyName;
-        Thread t = new Thread(new Runnable() {
+        threadRepository.startNonDaemon(new Runnable() {
             @Override
             public void run() {
                 LOGGER.info("requeue vertices (with concept type: %s, property name: %s)", finalConceptType, finalPropertyName);
@@ -86,9 +90,7 @@ public class QueueVertices implements ParameterizedHandler {
                 workQueueRepository.flush();
                 LOGGER.info("requeue all vertices complete. vertices looked at %d. items pushed %d.", count, pushedCount);
             }
-        });
-        t.setName("requeue-vertices");
-        t.start();
+        }, "requeue-vertices");
 
         return VisalloResponse.SUCCESS;
     }

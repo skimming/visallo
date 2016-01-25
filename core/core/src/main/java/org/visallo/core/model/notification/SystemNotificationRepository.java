@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.v5analytics.simpleorm.SimpleOrmSession;
 import org.apache.commons.lang.time.DateUtils;
 import org.json.JSONObject;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.exception.VisalloException;
 import org.visallo.core.model.lock.LeaderListener;
 import org.visallo.core.model.lock.LockRepository;
@@ -28,10 +29,11 @@ public class SystemNotificationRepository extends NotificationRepository {
             SimpleOrmSession simpleOrmSession,
             LockRepository lockRepository,
             UserRepository userRepository,
-            WorkQueueRepository workQueueRepository
+            WorkQueueRepository workQueueRepository,
+            ThreadRepository threadRepository
     ) {
         super(simpleOrmSession);
-        startBackgroundThread(lockRepository, userRepository, workQueueRepository);
+        startBackgroundThread(lockRepository, userRepository, workQueueRepository, threadRepository);
     }
 
     public List<SystemNotification> getActiveNotifications(User user) {
@@ -116,8 +118,10 @@ public class SystemNotificationRepository extends NotificationRepository {
         updateNotification(notification, user);
     }
 
-    protected void startBackgroundThread(final LockRepository lockRepository, final UserRepository userRepository, final WorkQueueRepository workQueueRepository) {
-        Thread t = new Thread(new Runnable() {
+    private void startBackgroundThread(final LockRepository lockRepository, final UserRepository userRepository,
+                                       final WorkQueueRepository workQueueRepository,
+                                       final ThreadRepository threadRepository) {
+        threadRepository.startDaemon(new Runnable() {
             @Override
             public void run() {
                 enabled = false;
@@ -145,10 +149,7 @@ public class SystemNotificationRepository extends NotificationRepository {
                     runPeriodically(userRepository, workQueueRepository);
                 }
             }
-        });
-        t.setDaemon(true);
-        t.setName(SystemNotificationRepository.class.getSimpleName() + "-background");
-        t.start();
+        }, SystemNotificationRepository.class.getSimpleName() + "-background");
     }
 
     private void runPeriodically(UserRepository userRepository, WorkQueueRepository workQueueRepository) {

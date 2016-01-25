@@ -25,7 +25,7 @@ public class HazelcastLockRepositoryTest extends LockRepositoryTestBase {
         String hazelcastConfigPath = HazelcastLockRepository.class.getResource("/org/visallo/core/model/hazelcast/hazelcast-config.xml").getFile();
         configuration.set(HazelcastConfiguration.CONFIGURATION_PREFIX + ".configFilePath", hazelcastConfigPath);
         hazelcastRepository = new HazelcastRepository(configuration);
-        lockRepository = new HazelcastLockRepository(hazelcastRepository);
+        lockRepository = new HazelcastLockRepository(hazelcastRepository, THREAD_REPOSITORY);
     }
 
     @After

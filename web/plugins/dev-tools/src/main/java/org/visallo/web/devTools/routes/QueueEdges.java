@@ -8,6 +8,7 @@ import com.v5analytics.webster.annotations.Required;
 import org.vertexium.Authorizations;
 import org.vertexium.Edge;
 import org.vertexium.Graph;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.model.user.UserRepository;
 import org.visallo.core.model.workQueue.Priority;
 import org.visallo.core.model.workQueue.WorkQueueRepository;
@@ -21,16 +22,19 @@ public class QueueEdges implements ParameterizedHandler {
     private final UserRepository userRepository;
     private final Graph graph;
     private final WorkQueueRepository workQueueRepository;
+    private final ThreadRepository threadRepository;
 
     @Inject
     public QueueEdges(
             UserRepository userRepository,
             Graph graph,
-            WorkQueueRepository workQueueRepository
+            WorkQueueRepository workQueueRepository,
+            ThreadRepository threadRepository
     ) {
         this.userRepository = userRepository;
         this.graph = graph;
         this.workQueueRepository = workQueueRepository;
+        this.threadRepository = threadRepository;
     }
 
     @Handle
@@ -45,7 +49,7 @@ public class QueueEdges implements ParameterizedHandler {
         final Authorizations authorizations = userRepository.getAuthorizations(userRepository.getSystemUser());
 
         final String finalLabel = label;
-        Thread t = new Thread(new Runnable() {
+        threadRepository.startNonDaemon(new Runnable() {
             @Override
             public void run() {
                 LOGGER.info("requeue all edges");
@@ -59,9 +63,7 @@ public class QueueEdges implements ParameterizedHandler {
                 workQueueRepository.flush();
                 LOGGER.info("requeue all edges complete");
             }
-        });
-        t.setName("requeue-edges");
-        t.start();
+        }, "requeue-edges");
 
         return VisalloResponse.SUCCESS;
     }

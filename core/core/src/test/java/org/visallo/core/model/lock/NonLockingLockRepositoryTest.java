@@ -8,7 +8,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class NonLockingLockRepositoryTest extends LockRepositoryTestBase {
-    private LockRepository lockRepository = new NonLockingLockRepository();
+    private LockRepository lockRepository = new NonLockingLockRepository(THREAD_REPOSITORY);
 
     @Test
     public void testCreateLock() throws Exception {

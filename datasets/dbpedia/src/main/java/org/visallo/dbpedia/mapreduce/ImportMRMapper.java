@@ -1,5 +1,6 @@
 package org.visallo.dbpedia.mapreduce;
 
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.config.Configuration;
 import org.visallo.core.config.HashMapConfigurationLoader;
 import org.visallo.core.exception.VisalloException;
@@ -30,6 +31,7 @@ import java.util.Map;
 
 public class ImportMRMapper extends VisalloElementMapperBase<LongWritable, Text> {
     private static final String DBPEDIA_ID_PREFIX = "DBPEDIA_";
+    private static final ThreadRepository THREAD_REPOSITORY = ThreadRepository.withShortTimeout();
     private Counter linesProcessedCounter;
     private VisibilityTranslator visibilityTranslator;
     private Visibility visibility;
@@ -56,7 +58,7 @@ public class ImportMRMapper extends VisalloElementMapperBase<LongWritable, Text>
         this.authorizations = new AccumuloAuthorizations();
         AccumuloAuthorizationRepository authorizationRepository = new AccumuloAuthorizationRepository();
         authorizationRepository.setGraph(getGraph());
-        authorizationRepository.setLockRepository(new NonLockingLockRepository());
+        authorizationRepository.setLockRepository(new NonLockingLockRepository(THREAD_REPOSITORY));
         try {
             Map configurationMap = VertexiumMRUtils.toMap(context.getConfiguration());
             Configuration config = HashMapConfigurationLoader.load(configurationMap);

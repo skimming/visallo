@@ -95,11 +95,15 @@ public abstract class StatusServer {
     public void shutdown() {
         try {
             httpServer.stop(0);
-        } catch (Throwable ex) {
-            LOGGER.error("Could not stop http server", ex);
+        } catch (Exception ex) {
+            LOGGER.warn("Could not stop http server", ex);
         }
 
-        statusRepository.deleteStatus(this.statusHandle);
+        try {
+            statusRepository.deleteStatus(this.statusHandle);
+        } catch (Exception ex) {
+            LOGGER.warn(String.format("status %s could not be deleted", this.statusHandle), ex);
+        }
     }
 
     private class StatusHandler implements HttpHandler {

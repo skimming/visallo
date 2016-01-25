@@ -1,6 +1,7 @@
 package org.visallo.externalResource.yarn;
 
 import org.visallo.core.bootstrap.InjectHelper;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.externalResource.ExternalResourceRunner;
 import org.visallo.core.status.StatusRepository;
 import org.visallo.core.util.VisalloLoggerFactory;
@@ -14,6 +15,7 @@ public class ExternalResourceWorkerYarnTask extends TaskBase {
 
     public void run() {
         StatusRepository statusRepository = InjectHelper.getInstance(StatusRepository.class);
-        new ExternalResourceRunner(getConfiguration(), statusRepository, getUser()).startAllAndWait();
+        ThreadRepository threadRepository = InjectHelper.getInstance(ThreadRepository.class);
+        new ExternalResourceRunner(getConfiguration(), statusRepository, threadRepository, getUser()).startAllAndWait();
     }
 }

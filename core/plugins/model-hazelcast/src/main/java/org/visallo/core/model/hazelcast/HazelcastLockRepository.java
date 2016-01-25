@@ -3,6 +3,7 @@ package org.visallo.core.model.hazelcast;
 import com.google.inject.Inject;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.hazelcast.core.ILock;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.exception.VisalloException;
 import org.visallo.core.model.lock.LeaderListener;
 import org.visallo.core.model.lock.Lock;
@@ -15,11 +16,13 @@ import java.util.concurrent.Callable;
 public class HazelcastLockRepository extends LockRepository {
     private static final VisalloLogger LOGGER = VisalloLoggerFactory.getLogger(HazelcastLockRepository.class);
     private final HazelcastRepository hazelcastRepository;
+    private final ThreadRepository threadRepository;
     private boolean exit;
 
     @Inject
-    public HazelcastLockRepository(HazelcastRepository hazelcastRepository) {
+    public HazelcastLockRepository(HazelcastRepository hazelcastRepository, ThreadRepository threadRepository) {
         this.hazelcastRepository = hazelcastRepository;
+        this.threadRepository = threadRepository;
         this.exit = false;
     }
 
@@ -44,7 +47,7 @@ public class HazelcastLockRepository extends LockRepository {
     @Override
     public void leaderElection(String lockName, final LeaderListener listener) {
         final ILock lock = hazelcastRepository.getHazelcastInstance().getLock(lockName);
-        Thread t = new Thread(new Runnable() {
+        threadRepository.startDaemon(new Runnable() {
             @Override
             public void run() {
                 while (!exit) {
@@ -76,13 +79,10 @@ public class HazelcastLockRepository extends LockRepository {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    LOGGER.debug("nothing we can do here");
+                    // nothing to do
                 }
             }
-        });
-        t.setName(HazelcastLockRepository.class.getSimpleName() + "-LeaderElection-" + lockName);
-        t.setDaemon(true);
-        t.start();
+        }, HazelcastLockRepository.class.getSimpleName() + "-LeaderElection-" + lockName);
     }
 
     @Override

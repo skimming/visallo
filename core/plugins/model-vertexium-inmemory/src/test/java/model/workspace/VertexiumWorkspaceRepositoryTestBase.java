@@ -17,6 +17,7 @@ import org.vertexium.inmemory.InMemoryGraph;
 import org.vertexium.inmemory.InMemoryGraphConfiguration;
 import org.vertexium.search.DefaultSearchIndex;
 import org.visallo.core.bootstrap.InjectHelper;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.config.Configuration;
 import org.visallo.core.config.HashMapConfigurationLoader;
 import org.visallo.core.formula.FormulaEvaluator;
@@ -55,6 +56,7 @@ public abstract class VertexiumWorkspaceRepositoryTestBase {
     protected static final GraphPosition GRAPH_POSITION = new GraphPosition(100, 100);
     protected static final String PROP1_IRI = "prop1";
 
+    private static final ThreadRepository THREAD_REPOSITORY = ThreadRepository.withShortTimeout();
     protected InMemoryGraph graph;
     protected InMemoryUser user1;
     protected InMemoryUser user2;
@@ -107,7 +109,7 @@ public abstract class VertexiumWorkspaceRepositoryTestBase {
         authorizationRepository = new InMemoryAuthorizationRepository();
 
         Configuration visalloConfiguration = new HashMapConfigurationLoader(new HashMap()).createConfiguration();
-        LockRepository lockRepository = new NonLockingLockRepository();
+        LockRepository lockRepository = new NonLockingLockRepository(THREAD_REPOSITORY);
 
         userRepository = new InMemoryUserRepository(
                 graph,

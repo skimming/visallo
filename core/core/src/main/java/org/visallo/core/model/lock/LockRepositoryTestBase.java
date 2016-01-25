@@ -1,5 +1,6 @@
 package org.visallo.core.model.lock;
 
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.util.VisalloLogger;
 import org.visallo.core.util.VisalloLoggerFactory;
 
@@ -8,6 +9,8 @@ import java.util.List;
 
 public class LockRepositoryTestBase {
     private static final VisalloLogger LOGGER = VisalloLoggerFactory.getLogger(LockRepositoryTestBase.class);
+
+    protected static final ThreadRepository THREAD_REPOSITORY = ThreadRepository.withShortTimeout();
 
     protected Thread createLockExercisingThread(final LockRepository lockRepository, final String lockName, int threadIndex, final List<String> messages) {
         Thread t = new Thread() {

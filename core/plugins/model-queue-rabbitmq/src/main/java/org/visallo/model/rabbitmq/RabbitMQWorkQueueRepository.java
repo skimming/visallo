@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.vertexium.Graph;
 import org.visallo.core.bootstrap.InjectHelper;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.config.Configuration;
 import org.visallo.core.exception.VisalloException;
 import org.visallo.core.ingest.WorkerSpout;
@@ -38,16 +39,19 @@ public class RabbitMQWorkQueueRepository extends WorkQueueRepository {
     private final Channel channel;
     private final Integer deliveryMode;
     private final Address[] rabbitMqAddresses;
+    private final ThreadRepository threadRepository;
     private Set<String> declaredQueues = new HashSet<>();
 
     @Inject
     public RabbitMQWorkQueueRepository(
             Graph graph,
             WorkQueueNames workQueueNames,
+            ThreadRepository threadRepository,
             Configuration configuration
     )
             throws IOException {
         super(graph, workQueueNames, configuration);
+        this.threadRepository = threadRepository;
         this.connection = RabbitMQUtils.openConnection(configuration);
         this.channel = RabbitMQUtils.openChannel(this.connection);
         this.channel.exchangeDeclare(getExchangeName(), "fanout");
@@ -170,7 +174,7 @@ public class RabbitMQWorkQueueRepository extends WorkQueueRepository {
             final QueueingConsumer callback = new QueueingConsumer(this.channel);
             this.channel.basicConsume(queueName, true, callback);
 
-            final Thread t = new Thread(new Runnable() {
+            threadRepository.startDaemon((new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -189,10 +193,7 @@ public class RabbitMQWorkQueueRepository extends WorkQueueRepository {
                         throw new VisalloException("broadcast listener has died", e);
                     }
                 }
-            });
-            t.setName("rabbitmq-subscribe-" + broadcastConsumer.getClass().getName());
-            t.setDaemon(true);
-            t.start();
+            }), "rabbitmq-subscribe-" + broadcastConsumer.getClass().getName());
         } catch (IOException e) {
             throw new VisalloException("Could not subscribe to broadcasts", e);
         }

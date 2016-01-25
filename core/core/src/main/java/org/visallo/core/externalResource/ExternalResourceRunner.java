@@ -1,6 +1,7 @@
 package org.visallo.core.externalResource;
 
 import org.visallo.core.bootstrap.InjectHelper;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.config.Configuration;
 import org.visallo.core.status.MetricEntry;
 import org.visallo.core.status.StatusRepository;
@@ -20,14 +21,17 @@ public class ExternalResourceRunner {
     private final Configuration config;
     private final User user;
     private final StatusRepository statusRepository;
+    private final ThreadRepository threadRepository;
 
     public ExternalResourceRunner(
             Configuration config,
             StatusRepository statusRepository,
+            ThreadRepository threadRepository,
             final User user
     ) {
         this.config = config;
         this.statusRepository = statusRepository;
+        this.threadRepository = threadRepository;
         this.user = user;
     }
 
@@ -78,7 +82,7 @@ public class ExternalResourceRunner {
 
     private RunningWorker start(final ExternalResourceWorker worker, final User user) {
         worker.prepare(user);
-        Thread t = new Thread(new Runnable() {
+        Thread thread = threadRepository.startDaemon(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -87,12 +91,8 @@ public class ExternalResourceRunner {
                     LOGGER.error("Failed running external resource worker: " + worker.getClass().getName(), ex);
                 }
             }
-        });
-        t.setName("external-resource-worker-" + worker.getClass().getSimpleName() + "-" + t.getId());
-        t.setDaemon(true);
-        LOGGER.debug("starting external resource worker thread: %s", t.getName());
-        t.start();
-        return new RunningWorker(worker, t);
+        }, "external-resource-worker-" + worker.getClass().getSimpleName());
+        return new RunningWorker(worker, thread);
     }
 
     public static class RunningWorker {

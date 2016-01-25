@@ -10,6 +10,7 @@ import org.vertexium.id.UUIDIdGenerator;
 import org.vertexium.inmemory.InMemoryGraph;
 import org.vertexium.inmemory.InMemoryGraphConfiguration;
 import org.vertexium.search.DefaultSearchIndex;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.config.Configuration;
 import org.visallo.core.config.HashMapConfigurationLoader;
 import org.visallo.core.model.lock.LockRepository;
@@ -34,6 +35,8 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VertexiumUserRepositoryTest {
+    private static final ThreadRepository THREAD_REPOSITORY = ThreadRepository.withShortTimeout();
+
     @Mock
     private OntologyRepository ontologyRepository;
 
@@ -55,7 +58,7 @@ public class VertexiumUserRepositoryTest {
     @Mock
     private UserNotificationRepository userNotificationRepository;
 
-    private LockRepository lockRepository = new NonLockingLockRepository();
+    private LockRepository lockRepository = new NonLockingLockRepository(THREAD_REPOSITORY);
 
     @Before
     public void setup() {

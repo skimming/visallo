@@ -1,6 +1,7 @@
 package org.visallo.web.initializers;
 
 import com.google.inject.Inject;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.config.Configuration;
 import org.visallo.core.externalResource.ExternalResourceRunner;
 import org.visallo.core.model.user.UserRepository;
@@ -14,16 +15,19 @@ public class ExternalResourceWorkersInitializer extends ApplicationBootstrapInit
     private final Configuration config;
     private final UserRepository userRepository;
     private final StatusRepository statusRepository;
+    private final ThreadRepository threadRepository;
 
     @Inject
     public ExternalResourceWorkersInitializer(
             Configuration config,
             UserRepository userRepository,
-            StatusRepository statusRepository
+            StatusRepository statusRepository,
+            ThreadRepository threadRepository
     ) {
         this.config = config;
         this.userRepository = userRepository;
         this.statusRepository = statusRepository;
+        this.threadRepository = threadRepository;
     }
 
     @Override
@@ -31,6 +35,6 @@ public class ExternalResourceWorkersInitializer extends ApplicationBootstrapInit
         LOGGER.debug("setupExternalResourceWorkers");
 
         final User user = userRepository.getSystemUser();
-        new ExternalResourceRunner(config, statusRepository, user).startAll();
+        new ExternalResourceRunner(config, statusRepository, threadRepository, user).startAll();
     }
 }

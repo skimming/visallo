@@ -1,8 +1,19 @@
 package org.visallo.core.model.lock;
 
+import com.google.inject.Inject;
+import org.visallo.core.concurrent.ThreadRepository;
+
 import java.util.concurrent.Callable;
 
 public class NonLockingLockRepository extends LockRepository {
+
+    private final ThreadRepository threadRepository;
+
+    @Inject
+    public NonLockingLockRepository(ThreadRepository threadRepository) {
+        this.threadRepository = threadRepository;
+    }
+
     @Override
     public Lock createLock(String lockName) {
         return new Lock(lockName) {
@@ -19,15 +30,12 @@ public class NonLockingLockRepository extends LockRepository {
 
     @Override
     public void leaderElection(String lockName, final LeaderListener listener) {
-        Thread t = new Thread(new Runnable() {
+        threadRepository.startDaemon(new Runnable() {
             @Override
             public void run() {
                 listener.isLeader();
             }
-        });
-        t.setName(NonLockingLockRepository.class.getSimpleName() + "-LeaderElection-" + lockName);
-        t.setDaemon(true);
-        t.start();
+        }, NonLockingLockRepository.class.getSimpleName() + "-LeaderElection-" + lockName);
     }
 
     @Override

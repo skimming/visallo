@@ -2,6 +2,7 @@ package org.visallo.web.initializers;
 
 import com.google.inject.Inject;
 import org.visallo.core.bootstrap.InjectHelper;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.config.Configuration;
 import org.visallo.core.model.longRunningProcess.LongRunningProcessRunner;
 import org.visallo.core.util.VisalloLogger;
@@ -12,10 +13,12 @@ public class LongRunningProcessRunnerInitializer extends ApplicationBootstrapIni
     public static final int DEFAULT_THREAD_COUNT = 1;
     private static final VisalloLogger LOGGER = VisalloLoggerFactory.getLogger(LongRunningProcessRunnerInitializer.class);
     private final Configuration config;
+    private final ThreadRepository threadRepository;
 
     @Inject
-    public LongRunningProcessRunnerInitializer(Configuration config) {
+    public LongRunningProcessRunnerInitializer(Configuration config, ThreadRepository threadRepository) {
         this.config = config;
+        this.threadRepository = threadRepository;
     }
 
     @Override
@@ -26,7 +29,7 @@ public class LongRunningProcessRunnerInitializer extends ApplicationBootstrapIni
 
         LOGGER.debug("long running process runners: %d", threadCount);
         for (int i = 0; i < threadCount; i++) {
-            Thread t = new Thread(new Runnable() {
+            threadRepository.startDaemon(new Runnable() {
                 @Override
                 public void run() {
                     delayStart();
@@ -38,11 +41,7 @@ public class LongRunningProcessRunnerInitializer extends ApplicationBootstrapIni
                         LOGGER.error("Failed running long running process runner", ex);
                     }
                 }
-            });
-            t.setName("long-running-process-runner-" + t.getId());
-            t.setDaemon(true);
-            LOGGER.debug("starting long running process runner thread: %s", t.getName());
-            t.start();
+            }, "long-running-process-runner-" + i);
         }
     }
 }

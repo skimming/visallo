@@ -11,6 +11,7 @@ import org.atmosphere.interceptor.HeartbeatInterceptor;
 import org.vertexium.Graph;
 import org.visallo.core.bootstrap.InjectHelper;
 import org.visallo.core.bootstrap.VisalloBootstrap;
+import org.visallo.core.concurrent.ThreadRepository;
 import org.visallo.core.config.Configuration;
 import org.visallo.core.config.ConfigurationLoader;
 import org.visallo.core.exception.VisalloException;
@@ -90,6 +91,9 @@ public class ApplicationBootstrap implements ServletContextListener {
 
         safeLogInfo("Shutdown: Graph");
         InjectHelper.getInstance(Graph.class).shutdown();
+
+        safeLogInfo("Shutdown: ThreadRepository");
+        InjectHelper.getInstance(ThreadRepository.class).shutdown();
 
         safeLogInfo("Shutdown: InjectHelper");
         InjectHelper.shutdown();
