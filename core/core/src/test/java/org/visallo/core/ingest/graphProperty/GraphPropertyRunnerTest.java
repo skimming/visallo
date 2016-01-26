@@ -35,15 +35,13 @@ public class GraphPropertyRunnerTest {
     private static final String PROP_KEY = "propKey";
     private static final String PROP_VALUE = "propValue";
 
-    private static final ThreadRepository THREAD_REPOSITORY = ThreadRepository.withShortTimeout();
-
     private GraphPropertyRunner _testSubject;
     private Graph _graph;
 
     @Before
     public void before() {
         _testSubject = new GraphPropertyRunner(mock(WorkQueueRepository.class), mock(StatusRepository.class),
-                THREAD_REPOSITORY, mock(Configuration.class));
+                mock(ThreadRepository.class), mock(Configuration.class));
         _graph = mock(Graph.class);
         _testSubject.setGraph(_graph);
     }
@@ -176,8 +174,6 @@ public class GraphPropertyRunnerTest {
         _testSubject.addGraphPropertyThreadedWrappers(graphPropertyThreadedWrapper);
 
         _testSubject.process(MESSAGE_ID, message);
-
-        stopInThread(graphPropertyThreadedWrapper);
     }
 
     private void inflateVertexAndAddToGraph(String vertexId, long numProperties) {
@@ -210,18 +206,6 @@ public class GraphPropertyRunnerTest {
         Thread thread = new Thread(testGPWThreadedWrapper);
         thread.start();
         return testGPWThreadedWrapper;
-    }
-
-    private void stopInThread(GraphPropertyThreadedWrapper... wrappers) throws InterruptedException {
-        for (GraphPropertyThreadedWrapper wrapper : wrappers) {
-            sleep();
-            wrapper.stop();
-            sleep();
-        }
-    }
-
-    private void sleep() throws InterruptedException {
-        Thread.sleep(50L);
     }
 
     private class TestCountingGPWStub extends GraphPropertyWorker {

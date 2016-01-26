@@ -13,7 +13,6 @@ import org.visallo.core.config.ConfigurationLoader;
 import org.visallo.core.config.VisalloTestClusterConfigurationLoader;
 import org.visallo.core.ingest.graphProperty.GraphPropertyRunner;
 import org.visallo.core.model.WorkQueueNames;
-import org.visallo.core.model.notification.SystemNotificationRepository;
 import org.visallo.core.model.user.AuthorizationRepository;
 import org.visallo.core.model.user.UserRepository;
 import org.visallo.core.model.workQueue.WorkQueueRepository;
@@ -146,11 +145,6 @@ public class VisalloTestCluster {
                 jetty.shutdown();
             }
 
-            LOGGER.info("shutdown: graphPropertyRunner");
-            if (graphPropertyRunner != null) {
-                graphPropertyRunner.shutdown();
-            }
-
             LOGGER.info("shutdown: SimpleOrmSession");
             if (InjectHelper.hasInjector()) {
                 SimpleOrmSession simpleOrmSession = InjectHelper.getInstance(SimpleOrmSession.class);
@@ -159,12 +153,6 @@ public class VisalloTestCluster {
                 } catch (IllegalStateException ex) {
                     // ignore this, the model session is already closed.
                 }
-            }
-
-            LOGGER.info("shutdown: Graph");
-            if (InjectHelper.hasInjector()) {
-                SystemNotificationRepository systemNotificationRepository = InjectHelper.getInstance(SystemNotificationRepository.class);
-                systemNotificationRepository.disable();
             }
 
             LOGGER.info("shutdown: Graph");
@@ -207,10 +195,6 @@ public class VisalloTestCluster {
         } catch (Exception ex) {
             throw new RuntimeException("Could not reset ZooSession internal state");
         }
-    }
-
-    public Properties getVisalloConfig() {
-        return config;
     }
 
     private void startAccumulo() {

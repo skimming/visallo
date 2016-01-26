@@ -30,7 +30,6 @@ public class HazelcastLockRepositoryTest extends LockRepositoryTestBase {
 
     @After
     public void after() {
-        lockRepository.shutdown();
         hazelcastRepository.getHazelcastInstance().shutdown();
     }
 

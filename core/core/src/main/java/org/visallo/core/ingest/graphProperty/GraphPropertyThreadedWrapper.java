@@ -31,7 +31,6 @@ public class GraphPropertyThreadedWrapper implements Runnable {
     private Counter processingCounter;
     private Counter totalErrorCounter;
     private Timer processingTimeTimer;
-    private boolean stopped;
     private final Queue<Work> workItems = new LinkedList<>();
     private final Queue<WorkResult> workResults = new LinkedList<>();
     private MetricsManager metricsManager;
@@ -39,10 +38,8 @@ public class GraphPropertyThreadedWrapper implements Runnable {
     @Override
     public final void run() {
         ensureMetricsInitialized();
-
-        stopped = false;
         try {
-            while (!stopped) {
+            while (true) {
                 Work work;
                 synchronized (workItems) {
                     if (workItems.size() == 0) {
@@ -77,6 +74,8 @@ public class GraphPropertyThreadedWrapper implements Runnable {
                         workResults.add(new WorkResult(null));
                         workResults.notifyAll();
                     }
+                } catch (InterruptedException ex) {
+                    throw ex;
                 } catch (Throwable ex) {
                     LOGGER.error("failed to complete work (%s): %s", workerClassName, elementId, ex);
                     totalErrorCounter.inc();
@@ -98,7 +97,7 @@ public class GraphPropertyThreadedWrapper implements Runnable {
                 }
             }
         } catch (InterruptedException ex) {
-            LOGGER.error("thread was interrupted", ex);
+            // exiting
         }
     }
 
@@ -138,10 +137,6 @@ public class GraphPropertyThreadedWrapper implements Runnable {
             }
             return workResults.remove();
         }
-    }
-
-    public void stop() {
-        stopped = true;
     }
 
     public GraphPropertyWorker getWorker() {

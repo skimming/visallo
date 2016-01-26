@@ -190,7 +190,7 @@ public class RabbitMQWorkQueueRepository extends WorkQueueRepository {
                             }
                         }
                     } catch (InterruptedException e) {
-                        throw new VisalloException("broadcast listener has died", e);
+                        // exiting
                     }
                 }
             }), "rabbitmq-subscribe-" + broadcastConsumer.getClass().getName());

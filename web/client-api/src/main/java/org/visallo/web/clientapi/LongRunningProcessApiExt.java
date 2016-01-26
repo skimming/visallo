@@ -7,17 +7,13 @@ import org.visallo.web.clientapi.util.ClientApiConverter;
 import org.json.JSONObject;
 
 public class LongRunningProcessApiExt extends LongrunningprocessApi {
-    public ClientApiLongRunningProcess waitById(String longRunningProcessId) throws ApiException {
+    public ClientApiLongRunningProcess waitById(String longRunningProcessId) throws ApiException, InterruptedException {
         while (true) {
             ClientApiLongRunningProcess longRunningProcess = findById(longRunningProcessId);
             if (longRunningProcess.getEndTime() != null || longRunningProcess.getError() != null || longRunningProcess.isCanceled()) {
                 return longRunningProcess;
             }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException("Could not sleep", e);
-            }
+            Thread.sleep(1000);
         }
     }
 

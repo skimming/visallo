@@ -152,7 +152,7 @@ public class UploadRdfIntegrationTest extends TestBase {
         }
     }
 
-    private void assertFindPath(VisalloApi visalloApi) throws ApiException {
+    private void assertFindPath(VisalloApi visalloApi) throws Exception {
         ClientApiLongRunningProcessSubmitResponse longRunningProcessResponse = visalloApi.getVertexApi().findPath(joeFernerVertexId, daveSingleyVertexId, 2);
         ClientApiLongRunningProcess longRunningProcess = visalloApi.getLongRunningProcessApi().waitById(longRunningProcessResponse.getId());
         String resultsString = longRunningProcess.getResultsString();

@@ -44,9 +44,4 @@ public class SingleJvmLockRepository extends LockRepository {
             }
         }, SingleJvmLockRepository.class.getSimpleName() + "-LeaderElection-" + lockName);
     }
-
-    @Override
-    public void shutdown() {
-        // no implementation required
-    }
 }

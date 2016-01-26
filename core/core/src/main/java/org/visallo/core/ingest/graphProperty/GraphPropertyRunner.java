@@ -445,12 +445,6 @@ public class GraphPropertyRunner extends WorkerBase {
         }
     }
 
-    public void shutdown() {
-        for (GraphPropertyThreadedWrapper wrapper : this.workerWrappers) {
-            wrapper.stop();
-        }
-    }
-
     public UserRepository getUserRepository() {
         return this.userRepository;
     }

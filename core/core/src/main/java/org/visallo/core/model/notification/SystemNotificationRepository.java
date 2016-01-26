@@ -5,7 +5,6 @@ import com.v5analytics.simpleorm.SimpleOrmSession;
 import org.apache.commons.lang.time.DateUtils;
 import org.json.JSONObject;
 import org.visallo.core.concurrent.ThreadRepository;
-import org.visallo.core.exception.VisalloException;
 import org.visallo.core.model.lock.LeaderListener;
 import org.visallo.core.model.lock.LockRepository;
 import org.visallo.core.model.user.UserRepository;
@@ -22,7 +21,7 @@ public class SystemNotificationRepository extends NotificationRepository {
     private static final VisalloLogger LOGGER = VisalloLoggerFactory.getLogger(SystemNotificationRepository.class);
     private static final String LOCK_NAME = SystemNotificationRepository.class.getName();
     private static final String VISIBILITY_STRING = "";
-    private boolean enabled;
+    private volatile boolean enabled;
 
     @Inject
     public SystemNotificationRepository(
@@ -135,24 +134,24 @@ public class SystemNotificationRepository extends NotificationRepository {
                     @Override
                     public void notLeader() {
                         LOGGER.debug("lost leadership (%s)", Thread.currentThread().getName());
-                        disable();
+                        enabled = false;
                     }
                 });
 
-                while (true) {
-                    try {
+                try {
+                    while (true) {
                         Thread.sleep(10 * 1000);
-                    } catch (InterruptedException e) {
-                        LOGGER.error("Failed to sleep", e);
-                        throw new VisalloException("Failed to sleep", e);
+                        runPeriodically(userRepository, workQueueRepository);
                     }
-                    runPeriodically(userRepository, workQueueRepository);
+                } catch (InterruptedException e) {
+                    // exiting
                 }
             }
         }, SystemNotificationRepository.class.getSimpleName() + "-background");
     }
 
-    private void runPeriodically(UserRepository userRepository, WorkQueueRepository workQueueRepository) {
+    private void runPeriodically(UserRepository userRepository, WorkQueueRepository workQueueRepository)
+            throws InterruptedException {
         try {
             while (enabled) {
                 LOGGER.debug("running periodically");
@@ -162,22 +161,17 @@ public class SystemNotificationRepository extends NotificationRepository {
                 for (SystemNotification notification : notifications) {
                     workQueueRepository.pushSystemNotification(notification);
                 }
-                try {
-                    long remainingMilliseconds = nowPlusOneMinute.getTime() - System.currentTimeMillis();
-                    if (remainingMilliseconds > 0) {
-                        Thread.sleep(remainingMilliseconds);
-                    }
-                } catch (InterruptedException e) {
-                    // do nothing
+                long remainingMilliseconds = nowPlusOneMinute.getTime() - System.currentTimeMillis();
+                if (remainingMilliseconds > 0) {
+                    Thread.sleep(remainingMilliseconds);
                 }
             }
+        } catch (InterruptedException ex) {
+            // exiting
+            throw ex;
         } catch (Throwable ex) {
             LOGGER.error("runPeriodically error", ex);
             throw ex;
         }
-    }
-
-    public void disable() {
-        enabled = false;
     }
 }

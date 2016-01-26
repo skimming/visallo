@@ -17,13 +17,11 @@ public class HazelcastLockRepository extends LockRepository {
     private static final VisalloLogger LOGGER = VisalloLoggerFactory.getLogger(HazelcastLockRepository.class);
     private final HazelcastRepository hazelcastRepository;
     private final ThreadRepository threadRepository;
-    private boolean exit;
 
     @Inject
     public HazelcastLockRepository(HazelcastRepository hazelcastRepository, ThreadRepository threadRepository) {
         this.hazelcastRepository = hazelcastRepository;
         this.threadRepository = threadRepository;
-        this.exit = false;
     }
 
     @Override
@@ -50,43 +48,38 @@ public class HazelcastLockRepository extends LockRepository {
         threadRepository.startDaemon(new Runnable() {
             @Override
             public void run() {
-                while (!exit) {
-                    try {
-                        if (lock.isLockedByCurrentThread()) {
-                            Thread.sleep(1000);
-                            continue;
-                        }
-                        lock.lock();
-                        listener.isLeader();
-                    } catch (HazelcastInstanceNotActiveException exInner) {
-                        handleHazelcastInstanceNotActiveException(exInner);
-                    } catch (Throwable ex) {
-                        if (exit) {
-                            return;
-                        }
-                        LOGGER.error("Could not elect leader", ex);
+                try {
+                    while (true) {
                         try {
-                            lock.unlock();
+                            if (lock.isLockedByCurrentThread()) {
+                                Thread.sleep(1000);
+                                continue;
+                            }
+                            lock.lock();
+                            listener.isLeader();
                         } catch (HazelcastInstanceNotActiveException exInner) {
-                            handleHazelcastInstanceNotActiveException(exInner);
+                            handleHazelcastInstanceNotActiveException();
+                        } catch (InterruptedException ex) {
+                            throw ex;
+                        } catch (Throwable ex) {
+                            LOGGER.error("Could not elect leader", ex);
+                            try {
+                                lock.unlock();
+                            } catch (HazelcastInstanceNotActiveException exInner) {
+                                handleHazelcastInstanceNotActiveException();
+                            }
                         }
                     }
+                } catch (InterruptedException ex) {
+                    // exiting
                 }
             }
 
-            private void handleHazelcastInstanceNotActiveException(HazelcastInstanceNotActiveException exInner) {
+            private void handleHazelcastInstanceNotActiveException()
+                    throws InterruptedException{
                 LOGGER.debug("Hazelcast is already shutdown and will release the lock for us");
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    // nothing to do
-                }
+                Thread.sleep(1000);
             }
         }, HazelcastLockRepository.class.getSimpleName() + "-LeaderElection-" + lockName);
-    }
-
-    @Override
-    public void shutdown() {
-        exit = true;
     }
 }

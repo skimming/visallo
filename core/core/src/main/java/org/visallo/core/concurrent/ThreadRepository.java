@@ -1,6 +1,5 @@
 package org.visallo.core.concurrent;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Singleton;
 import org.visallo.core.exception.VisalloException;
 import org.visallo.core.util.VisalloLogger;
@@ -11,6 +10,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * All threads in Visallo, and in plugins, should be started using this class. {@link ExecutorService} is used to
+ * create the thread pool, execute the {@link Runnable} tasks, and perform an orderly exit of threads when
+ * {@link #shutdown()} is called (this is how the web application context listener cleans up all threads) or the JVM
+ * exits. Threads that endlessly loop and execute methods that throw {@link InterruptedException}, such as
+ * {@link Thread#sleep(long)} and {@link Object#wait()}, should catch that exception in a try block outside of the loop,
+ * and let the {@link Runnable#run()} method return without error. This is preferred over implementing a special
+ * "shutdown" method that exits the loop. If it is necessary to stop a looping thread outside of this class, call
+ * {@link Thread#interrupt()} on the thread, and let the while loop exit as described above.
+ */
 @Singleton
 public class ThreadRepository {
     private static final VisalloLogger LOGGER = VisalloLoggerFactory.getLogger(ThreadRepository.class);
@@ -22,6 +31,9 @@ public class ThreadRepository {
     private final long terminationTimeoutMillis;
     private volatile boolean shutdown = false;
 
+    /**
+     * Create a new ThreadRepository with the default termination timeout.
+     */
     public ThreadRepository() {
         this(DEFAULT_TERMINATION_TIMEOUT_MILLIS);
     }
@@ -39,37 +51,40 @@ public class ThreadRepository {
         });
     }
 
-    @VisibleForTesting
+    /**
+     * Returns a new ThreadRepository with a very short termination timeout. This should only be used by unit tests.
+     *
+     * @return the new ThreadRepository
+     */
     public static ThreadRepository withShortTimeout() {
         return new ThreadRepository(SHORT_TERMINATION_TIMEOUT_MILLIS);
     }
 
+    /**
+     * Start a new daemon thread.
+     *
+     * @param runnable the task to execute
+     * @param name the name assigned to the thread
+     * @return the new thread
+     */
     public Thread startDaemon(Runnable runnable, String name) {
         return start(runnable, true, name);
     }
 
+    /**
+     * Start a new non-daemon thread.
+     *
+     * @param runnable the task to execute
+     * @param name the name assigned to the thread
+     * @return the new thread
+     */
     public Thread startNonDaemon(Runnable runnable,  String name) {
         return start(runnable, false, name);
     }
 
-    private Thread start(Runnable runnable, boolean isDaemon, String name) {
-        if (shutdown) {
-            throw new VisalloException("already shut down");
-        }
-        Thread thread;
-        ThreadProperties threadProperties = new ThreadProperties();
-        threadProperties.isDaemon = isDaemon;
-        threadProperties.name = name;
-        threadLocalProperties.set(threadProperties);
-        try {
-            executorService.execute(runnable);
-        } finally {
-            thread = threadLocalProperties.get().thread;
-            threadLocalProperties.remove();
-        }
-        return thread;
-    }
-
+    /**
+     * Perform an orderly shutdown of all threads.
+     */
     public void shutdown() {
         if (shutdown) {
             return;
@@ -89,6 +104,24 @@ public class ThreadRepository {
             }
             executorService.shutdownNow();
         }
+    }
+
+    private Thread start(Runnable runnable, boolean isDaemon, String name) {
+        if (shutdown) {
+            throw new VisalloException("already shut down");
+        }
+        Thread thread;
+        ThreadProperties threadProperties = new ThreadProperties();
+        threadProperties.isDaemon = isDaemon;
+        threadProperties.name = name;
+        threadLocalProperties.set(threadProperties);
+        try {
+            executorService.execute(runnable);
+        } finally {
+            thread = threadLocalProperties.get().thread;
+            threadLocalProperties.remove();
+        }
+        return thread;
     }
 
     private static class ThreadProperties {

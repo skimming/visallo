@@ -37,9 +37,4 @@ public class NonLockingLockRepository extends LockRepository {
             }
         }, NonLockingLockRepository.class.getSimpleName() + "-LeaderElection-" + lockName);
     }
-
-    @Override
-    public void shutdown() {
-        // no implementation required
-    }
 }
