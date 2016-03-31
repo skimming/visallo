@@ -35,7 +35,8 @@ define([
             justificationSelector: '.justification',
             conceptSelector: '.concept-container',
             singleSelector: '.single',
-            individualVisibilitySelector: '.individual-visibility'
+            individualSelector: '.individual',
+            destinationSelector: '.drop-destination'
         });
 
         this.after('teardown', function() {
@@ -56,12 +57,21 @@ define([
 
         this.before('initialize', function(node, config) {
             config.template = 'fileImport/template';
+            var justificationValidation;
 
             if (!config.files) config.files = [];
+
+            this.dataRequest('config', 'properties')
+                .done(function(properties) {
+                    justificationValidation = properties['field.justification.validation'];
+                    self.toGraphThreshold = parseInt(properties['import.files.graph.limit']);
+                    config.toGraph = config.files.length < self.toGraphThreshold;
+                });
 
             config.hasFile = config.files.length > 0;
             config.multipleFiles = config.files.length > 1;
             config.title = this.getTitle(config.files, config.stringType);
+            config.import = true;
 
             this.after('setupWithTemplate', function() {
                 var self = this;
@@ -71,8 +81,12 @@ define([
                     y: window.lastMousePositionY
                 };
                 this.visibilitySource = null;
+                this.justificationValidation = justificationValidation;
+
                 this.visibilitySources = new Array(config.files.length);
+                this.justifications = new Array(config.files.length);
                 this.concepts = new Array(config.files.length);
+                this.destinations = new Array(config.files.length);
 
                 this.on(this.popover, 'visibilitychange', this.onVisibilityChange);
                 this.on(this.popover, 'justificationchange', this.onJustificationChange);
@@ -87,7 +101,8 @@ define([
 
                 this.on(this.popover, 'change', {
                     toggleCheckboxSelector: this.onCheckboxCopy,
-                    importFileSelector: this.onFileChange
+                    importFileSelector: this.onFileChange,
+                    destinationSelector: this.onDestinationChange
                 })
 
                 this.on(this.popover, 'keyup', {
@@ -123,20 +138,23 @@ define([
             if (files.length === 0) {
                 this.popover.find(this.attr.importFileButtonSelector).toggle(!this.attr.stringType);
                 this.popover.find(this.attr.toggleCheckboxSelector).hide();
-                this.popover.find(this.attr.individualVisibilitySelector).hide();
+                this.popover.find(this.attr.individualSelector).hide();
                 $single.html(fileTemplate({
                     name: this.attr.stringType || undefined,
                     index: 'collapsed',
-                    justification: true
+                    justification: true,
+                    destination: false
                 }))
             } else if (files.length === 1) {
                 this.popover.find(this.attr.importFileButtonSelector).hide();
                 this.popover.find(this.attr.toggleCheckboxSelector).hide();
-                this.popover.find(this.attr.individualVisibilitySelector).hide();
+                this.popover.find(this.attr.individualSelector).hide();
                 $single.html(fileTemplate({
                     name: files[0].name,
                     size: F.bytes.pretty(files[0].size, 0),
-                    index: 'collapsed'
+                    index: 'collapsed',
+                    justification: self.justificationValidation === 'NONE' ? false : true,
+                    destination: true
                 }));
             } else {
                 this.popover.find(this.attr.importFileButtonSelector).hide();
@@ -149,22 +167,26 @@ define([
                                 return memo + num;
                             }, 0)
                             .value()),
-                    index: 'collapsed'
+                    index: 'collapsed',
+                    justification: self.justificationValidation === 'NONE' ? false : true,
+                    destination: true
                 }));
-                this.popover.find(this.attr.individualVisibilitySelector)
+                this.popover.find(this.attr.individualSelector)
                     .hide()
                     .html(
                         $.map(files, function(file, i) {
                             return fileTemplate({
                                 name: file.name,
                                 size: F.bytes.pretty(file.size, 0),
-                                index: i
+                                index: i,
+                                justification: self.justificationValidation === 'NONE' ? false : true,
+                                destination: true
                             })
                         })
                     )
             }
 
-            Justification.attachTo(this.popover.find(this.attr.justificationSelector).eq(0));
+            Justification.attachTo(this.popover.find(this.attr.justificationSelector));
             VisibilityEditor.attachTo(this.popover.find(this.attr.visibilityInputSelector));
             ConceptSelector.attachTo(this.popover.find(this.attr.conceptSelector).eq(0), {
                 focus: true,
@@ -185,7 +207,8 @@ define([
                 checked = $checkbox.is(':checked');
 
             this.popover.toggleClass('collapseVisibility', checked);
-            this.popover.find(this.attr.individualVisibilitySelector).toggle(!checked);
+            this.popover.find(this.attr.singleSelector).toggle(checked);
+            this.popover.find(this.attr.individualSelector).toggle(!checked);
             this.popover.find('.errors').empty();
             _.delay(this.positionDialog.bind(this), 50);
         };
@@ -207,7 +230,16 @@ define([
         };
 
         this.onJustificationChange = function(event, data) {
-            this.justification = data;
+            var index = $(event.target)
+                .data('justification', data)
+                .data('fileIndex');
+
+            if (index === 'collapsed') {
+                this.justification = data;
+            } else {
+                this.justifications[index] = data;
+            }
+
             this.checkValid();
         };
 
@@ -225,6 +257,20 @@ define([
             this.checkValid();
         };
 
+        this.onDestinationChange = function(event, data) {
+            var index = $(event.target)
+                .data('toGraph', data)
+                .data('fileIndex');
+
+            if (index === 'collapsed') {
+                this.destination = $(event.target).is(':checked');
+            } else {
+                this.destinations[index] = $(event.target).is(':checked');
+            }
+
+            this.checkValid();
+        }
+
         this.checkValid = function() {
             var collapsed = this.isVisibilityCollapsed(),
                 isValid = collapsed ?
@@ -238,13 +284,20 @@ define([
                 isValid = false;
             }
 
+            if (self.justificationValidation === 'REQUIRED') {
+                isValid = collapsed ?
+                    (this.justification && this.justification.valid) :
+                    _.every(this.justifications, _.property('valid'));
+            }
+
+
             this.popover.find(this.attr.importSelector).prop('disabled', !isValid);
 
             return isValid;
         };
 
         this.isVisibilityCollapsed = function() {
-            var checkbox = this.popover.find('.checkbox input');
+            var checkbox = this.popover.find('.checkbox .copyVisibility');
 
             return checkbox.length === 0 || checkbox.is(':checked');
         };
@@ -275,17 +328,41 @@ define([
                     }),
                 visibilityValue = collapsed ?
                     this.visibilitySource.value :
-                    _.map(this.visibilitySources, _.property('value'));
+                    _.map(this.visibilitySources, _.property('value')),
+                justificationValue = false,
+                destinationValue = collapsed ?
+                   this.destination : this.destinations,
+                metadata = {
+                    individual: !collapsed
+                };
+
+            if (this.justificationValidation !== 'NONE') {
+                justificationValue = collapsed ?
+                    this.justification.justificationText :
+                    _.map(this.justifications, _.property('justificationText'));
+            }
 
             this.attr.teardownOnTap = false;
 
-            var req = _.partial(this.dataRequest.bind(this), 'vertex', _, _, conceptValue, visibilityValue);
+            var req = _.partial(
+                this.dataRequest.bind(this),
+                 'vertex',
+                  _,
+                  _,
+                  conceptValue,
+                  visibilityValue,
+                  justificationValue,
+                  destinationValue,
+                  metadata
+            );
+
             if (files.length) {
                 this.request = req('importFiles', files);
             } else if (this.attr.string) {
                 this.request = req('importFileString', {
                     string: this.attr.string,
-                    type: this.attr.stringMimeType
+                    type: this.attr.stringMimeType,
+                    justification: this.justification
                 });
             } else {
                 this.request = req('create', this.justification);

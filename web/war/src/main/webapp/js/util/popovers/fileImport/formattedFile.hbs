@@ -9,3 +9,9 @@
 <div class="justification" data-file-index="{{index}}"></div>
 {{/if}}
 <div class="visibility" data-file-index="{{index}}"></div>
+{{#if destination}}
+<label class="checkbox" style="{{#if checked}}display:none{{/if}}">
+    <input class="drop-destination" type="checkbox" {{#if toGraph}}checked{{/if}} data-file-index="{{index}}">
+    {{ i18n 'popovers.file_import.toGraph' }}
+</label>
+{{/if}}

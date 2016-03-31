@@ -176,23 +176,49 @@ define([
             }));
         },
 
-        importFiles: function(files, conceptValue, visibilitySource) {
+        importFiles: function(files, conceptValue, visibilitySource, justificationValue, destinationValue, metadata) {
             var formData = new FormData();
 
-            _.forEach(files, function(f) {
-                formData.append('file', f);
-                if (_.isString(visibilitySource)) {
-                    formData.append('visibilitySource', visibilitySource);
-                }
-                if (_.isString(conceptValue)) {
-                    formData.append('conceptId', conceptValue);
-                }
-            });
-
-            if (_.isArray(conceptValue)) {
-                _.forEach(conceptValue, function(v) {
-                    formData.append('conceptId', v);
-                });
+            if (metadata && metadata.individual) {
+                _.each(files, function(f, i) {
+                    formData.append('file', f);
+                    if (_.isString(conceptValue[i])) {
+                        formData.append('conceptId', conceptValue[i]);
+                    }
+                    if (_.isString(visibilitySource[i])) {
+                        formData.append('visibilitySource', visibilitySource[i]);
+                    }
+                    if (justificationValue) {
+                        if (_.isString(justificationValue[i])) {
+                            formData.append('justification', justificationValue[i]);
+                        }
+                    }
+                    if (_.isBoolean(destinationValue[i])) {
+                        formData.append('destination', destinationValue[i]);
+                    } else {
+                        formData.append('destination', false);
+                    }
+                })
+            } else {
+                _.each(files, function(f) {
+                    formData.append('file', f);
+                    if (_.isString(conceptValue)) {
+                        formData.append('conceptId', conceptValue);
+                    }
+                    if (_.isString(visibilitySource)) {
+                        formData.append('visibilitySource', visibilitySource);
+                    }
+                    if (justificationValue) {
+                        if (_.isString(justificationValue)) {
+                            formData.append('justification', justificationValue);
+                        }
+                    }
+                    if (_.isBoolean(destinationValue)) {
+                        formData.append('destination', destinationValue);
+                    } else {
+                        formData.append('destination', false);
+                    }
+                })
             }
 
             return ajax('POST', '/vertex/import', formData);

@@ -38,6 +38,7 @@ public class WebConfiguration {
     public static final String MAP_PROVIDER_OSM_URL = PREFIX + "map.provider.osm.url";
     public static final String LOGIN_SHOW_POWERED_BY = PREFIX + "login.showPoweredBy";
     public static final String SHOW_VERSION_COMMENTS = PREFIX + "showVersionComments";
+    public static final String IMPORT_FILES_GRAPH_LIMIT = PREFIX + "import.files.graph.limit";
     public static final PropertyMetadata PROPERTY_METADATA_SOURCE_TIMEZONE = new PropertyMetadata("http://visallo.org#sourceTimezone",
             "properties.metadata.label.source_timezone",
             "timezone");
@@ -117,6 +118,9 @@ public class WebConfiguration {
         DEFAULTS.put(MAP_PROVIDER_OSM_URL, "https://a.tile.openstreetmap.org/${z}/${x}/${y}.png," +
                 "https://b.tile.openstreetmap.org/${z}/${x}/${y}.png," +
                 "https://c.tile.openstreetmap.org/${z}/${x}/${y}.png");
+
+        //File import thresholds
+        DEFAULTS.put(IMPORT_FILES_GRAPH_LIMIT, "50");
     }
 
     public static class PropertyMetadata {
