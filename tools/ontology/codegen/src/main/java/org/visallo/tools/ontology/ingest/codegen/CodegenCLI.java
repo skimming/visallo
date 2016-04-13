@@ -29,7 +29,6 @@ import org.visallo.core.util.VisalloLoggerFactory;
 import org.visallo.tools.ontology.ingest.common.BaseConceptBuilder;
 import org.visallo.tools.ontology.ingest.common.BaseEntityBuilder;
 import org.visallo.tools.ontology.ingest.common.BaseRelationshipBuilder;
-import org.visallo.tools.ontology.ingest.common.IngestRepository;
 import org.visallo.web.clientapi.JsonUtil;
 import org.visallo.web.clientapi.UserNameAndPasswordVisalloApi;
 import org.visallo.web.clientapi.VisalloApi;
@@ -74,8 +73,6 @@ public class CodegenCLI extends CommandLineTool {
       throw new VisalloException("inputJsonFile or visalloUrl, visalloUsername, and visalloPassword parameters are required");
     }
 
-    String ontologyHash = IngestRepository.calculateOntologyHash(ontologyJsonString);
-
     ClientApiOntology ontology = JsonUtil.getJsonMapper().readValue(ontologyJsonString, ClientApiOntology.class);
 
     Map<String, ClientApiOntology.Property> propertyMap = new HashMap<>();
@@ -85,7 +82,7 @@ public class CodegenCLI extends CommandLineTool {
 
     ontology.getConcepts().forEach(concept -> {
       try {
-        createConceptClass(ontologyHash, concept, propertyMap);
+        createConceptClass(concept, propertyMap);
       } catch (IOException ioe) {
         throw new VisalloException("Unable to create concept class", ioe);
       }
@@ -93,7 +90,7 @@ public class CodegenCLI extends CommandLineTool {
 
     ontology.getRelationships().forEach(relationship -> {
       try {
-        createRelationshipClass(ontologyHash, relationship, propertyMap);
+        createRelationshipClass(relationship, propertyMap);
       } catch (IOException ioe) {
         throw new VisalloException("Unable to create concept class", ioe);
       }
@@ -102,7 +99,7 @@ public class CodegenCLI extends CommandLineTool {
     return 0;
   }
 
-  protected void createConceptClass(String ontologyHash, ClientApiOntology.Concept concept, Map<String, ClientApiOntology.Property> propertyMap) throws IOException {
+  protected void createConceptClass(ClientApiOntology.Concept concept, Map<String, ClientApiOntology.Property> propertyMap) throws IOException {
     String conceptPackage = packageNameFromIri(concept.getId());
     if (conceptPackage != null) {
       String conceptClassName = classNameFromIri(concept.getId());
@@ -128,12 +125,12 @@ public class CodegenCLI extends CommandLineTool {
             })
             .collect(Collectors.toList());
 
-        writeClass(writer, ontologyHash, conceptPackage, conceptClassName, parentClass, concept.getId(), properties);
+        writeClass(writer, conceptPackage, conceptClassName, parentClass, concept.getId(), properties);
       }
     }
   }
 
-  protected void createRelationshipClass(String ontologyHash, ClientApiOntology.Relationship relationship, Map<String, ClientApiOntology.Property> propertyMap) throws IOException {
+  protected void createRelationshipClass(ClientApiOntology.Relationship relationship, Map<String, ClientApiOntology.Property> propertyMap) throws IOException {
     String relationshipPackage = packageNameFromIri(relationship.getTitle());
     if (relationshipPackage != null) {
       String relationshipClassName = classNameFromIri(relationship.getTitle());
@@ -167,7 +164,7 @@ public class CodegenCLI extends CommandLineTool {
           });
         };
 
-        writeClass(writer, ontologyHash, relationshipPackage, relationshipClassName, BaseRelationshipBuilder.class.getName(), relationship.getTitle(), properties, inOutMethods);
+        writeClass(writer, relationshipPackage, relationshipClassName, BaseRelationshipBuilder.class.getName(), relationship.getTitle(), properties, inOutMethods);
       }
     }
   }
@@ -184,11 +181,11 @@ public class CodegenCLI extends CommandLineTool {
     }
     return null;
   }
-  protected void writeClass(PrintWriter writer, String ontologyHash, String packageName, String className, String parentClass, String iri, List<ClientApiOntology.Property> properties) {
-    writeClass(writer, ontologyHash, packageName, className, parentClass, iri, properties, null);
+  protected void writeClass(PrintWriter writer, String packageName, String className, String parentClass, String iri, List<ClientApiOntology.Property> properties) {
+    writeClass(writer, packageName, className, parentClass, iri, properties, null);
   }
 
-  protected void writeClass(PrintWriter writer, String ontologyHash, String packageName, String className, String parentClass, String iri, List<ClientApiOntology.Property> properties, Consumer<PrintWriter> additionalContentProvider) {
+  protected void writeClass(PrintWriter writer, String packageName, String className, String parentClass, String iri, List<ClientApiOntology.Property> properties, Consumer<PrintWriter> additionalContentProvider) {
     writer.println("package " + packageName + ";");
     writer.println();
 
@@ -205,7 +202,6 @@ public class CodegenCLI extends CommandLineTool {
     writer.println("import " + BaseEntityBuilder.class.getName() + "." + PROPERTY_ADDITION_CLASS.getSimpleName() + ";");
     writer.println();
     writer.println("public class " + className + " extends " + parentClass + " {");
-    writer.println("  public static final String ONTOLOGY_HASH=\"" + ontologyHash + "\";");
     writer.println();
     writer.println("  public " + className + "(String id) { super(id); }");
     writer.println();
