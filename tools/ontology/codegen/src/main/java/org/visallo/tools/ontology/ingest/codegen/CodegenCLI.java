@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.FileConverter;
 import com.google.common.base.Strings;
-import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -32,6 +31,8 @@ import org.visallo.tools.ontology.ingest.common.BaseConceptBuilder;
 import org.visallo.tools.ontology.ingest.common.BaseEntityBuilder;
 import org.visallo.tools.ontology.ingest.common.BaseRelationshipBuilder;
 import org.visallo.web.clientapi.JsonUtil;
+import org.visallo.web.clientapi.UserNameAndPasswordVisalloApi;
+import org.visallo.web.clientapi.VisalloApi;
 import org.visallo.web.clientapi.model.ClientApiOntology;
 import org.visallo.web.clientapi.model.PropertyType;
 
@@ -41,10 +42,19 @@ public class CodegenCLI extends CommandLineTool {
   private static final Pattern CLASSNAME_PART_MATCHER = Pattern.compile("^[a-zA-Z0-9]+$");
   private static final Class PROPERTY_ADDITION_CLASS = BaseEntityBuilder.PropertyAddition.class;
 
-  @Parameter(names = {"--inputJsonFile", "-f"}, arity = 1, required = true, converter = FileConverter.class)
+  @Parameter(names = {"--inputJsonFile", "-f"}, arity = 1, converter = FileConverter.class)
   private File inputJsonFile;
 
-  @Parameter(names = {"--outputDirectory", "-o"}, arity = 1, required = true)
+  @Parameter(names = {"--visalloUrl", "-url"}, arity = 1)
+  private String visalloUrl;
+
+  @Parameter(names = {"--visalloUsername", "-u"}, arity = 1)
+  private String visalloUsername;
+
+  @Parameter(names = {"--visalloPassword", "-p"}, arity = 1)
+  private String visalloPassword;
+
+  @Parameter(names = {"--outputDirectory", "-o"}, arity = 1)
   private String outputDirectory;
 
   public static void main(String[] args) throws Exception {
@@ -53,10 +63,18 @@ public class CodegenCLI extends CommandLineTool {
 
   @Override
   protected int run() throws Exception {
-    String ontologyJsonString = new String(Files.readAllBytes(inputJsonFile.toPath()), Charset.forName("UTF-8"));
-    HashFunction hashFunction = Hashing.murmur3_128();
+    String ontologyJsonString;
+    if (inputJsonFile != null) {
+      ontologyJsonString = new String(Files.readAllBytes(inputJsonFile.toPath()), Charset.forName("UTF-8"));
+    } else if (!Strings.isNullOrEmpty(visalloUrl) && !Strings.isNullOrEmpty(visalloUsername) && !Strings.isNullOrEmpty(visalloPassword)) {
+      VisalloApi visalloApi = new UserNameAndPasswordVisalloApi(visalloUrl, visalloUsername,  visalloPassword, true);
+      ontologyJsonString = visalloApi.invokeAPI("/ontology", "GET", null, null, null, null, "application/json");
+      visalloApi.logout();
+    } else {
+      throw new VisalloException("inputJsonFile or visalloUrl, visalloUsername, and visalloPassword parameters are required");
+    }
 
-    String ontologyHash = hashFunction.hashString(ontologyJsonString).toString();
+    String ontologyHash = Hashing.murmur3_128().hashString(ontologyJsonString).toString();
 
     ClientApiOntology ontology = JsonUtil.getJsonMapper().readValue(ontologyJsonString, ClientApiOntology.class);
 
