@@ -89,6 +89,11 @@ public class CodegenCLI extends CommandLineTool {
     if (conceptPackage != null) {
       String conceptClassName = classNameFromIri(concept.getId());
 
+      // Don't expose the visallo internal concepts to the generated code
+      if (conceptPackage.startsWith("org.visallo") && !conceptClassName.equals("Root")) {
+        return;
+      }
+
       LOGGER.debug("Create concept %s.%s", conceptPackage, conceptClassName);
 
       try (PrintWriter writer = createWriter(concept.getId())) {
@@ -114,6 +119,11 @@ public class CodegenCLI extends CommandLineTool {
     String relationshipPackage = packageNameFromIri(relationship.getTitle());
     if (relationshipPackage != null) {
       String relationshipClassName = classNameFromIri(relationship.getTitle());
+
+      // Don't expose the visallo internal concepts to the generated code
+      if (relationshipPackage.startsWith("org.visallo")) {
+        return;
+      }
 
       LOGGER.debug("Create relationship %s.%s", relationshipPackage, relationshipClassName);
 
