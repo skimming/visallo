@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.FileConverter;
 import com.google.common.base.Strings;
-import com.google.common.hash.Hashing;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -30,6 +29,7 @@ import org.visallo.core.util.VisalloLoggerFactory;
 import org.visallo.tools.ontology.ingest.common.BaseConceptBuilder;
 import org.visallo.tools.ontology.ingest.common.BaseEntityBuilder;
 import org.visallo.tools.ontology.ingest.common.BaseRelationshipBuilder;
+import org.visallo.tools.ontology.ingest.common.IngestRepository;
 import org.visallo.web.clientapi.JsonUtil;
 import org.visallo.web.clientapi.UserNameAndPasswordVisalloApi;
 import org.visallo.web.clientapi.VisalloApi;
@@ -74,7 +74,7 @@ public class CodegenCLI extends CommandLineTool {
       throw new VisalloException("inputJsonFile or visalloUrl, visalloUsername, and visalloPassword parameters are required");
     }
 
-    String ontologyHash = Hashing.murmur3_128().hashString(ontologyJsonString).toString();
+    String ontologyHash = IngestRepository.calculateOntologyHash(ontologyJsonString);
 
     ClientApiOntology ontology = JsonUtil.getJsonMapper().readValue(ontologyJsonString, ClientApiOntology.class);
 
