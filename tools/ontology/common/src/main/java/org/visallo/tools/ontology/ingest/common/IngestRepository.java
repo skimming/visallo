@@ -2,6 +2,8 @@ package org.visallo.tools.ontology.ingest.common;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +27,13 @@ import org.visallo.core.model.ontology.Relationship;
 import org.visallo.core.model.properties.VisalloProperties;
 import org.visallo.core.model.user.UserRepository;
 import org.visallo.core.security.VisibilityTranslator;
+import org.visallo.core.util.VisalloLogger;
+import org.visallo.core.util.VisalloLoggerFactory;
 import org.visallo.web.clientapi.model.PropertyType;
 
 public class IngestRepository {
+  private static final VisalloLogger LOGGER = VisalloLoggerFactory.getLogger(IngestRepository.class);
+
   private Graph graph;
   private UserRepository userRepository;
   private VisibilityTranslator visibilityTranslator;
@@ -58,6 +64,11 @@ public class IngestRepository {
   }
 
   public void save(BaseEntityBuilder... builders) {
+    save(Arrays.asList(builders));
+  }
+
+  public void save(Collection<BaseEntityBuilder> builders) {
+    LOGGER.debug("Saving %d entities", builders.size());
     for (final BaseEntityBuilder builder : builders) {
       if (builder instanceof BaseConceptBuilder) {
         if (!save((BaseConceptBuilder) builder, false)) {
@@ -93,6 +104,7 @@ public class IngestRepository {
 
       valid = addProperties(vertexBuilder, conceptBuilder, save);
       if (valid && save) {
+        LOGGER.trace("Saving vertex: %s", vertexBuilder.getVertexId());
         vertexBuilder.save(getAuthorizations());
       }
     }
@@ -114,6 +126,7 @@ public class IngestRepository {
 
       valid = addProperties(edgeBuilder, relationshipBuilder, save);
       if (valid && save) {
+        LOGGER.trace("Saving edge: %s", edgeBuilder.getEdgeId());
         edgeBuilder.save(getAuthorizations());
       }
     }
