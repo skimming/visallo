@@ -196,6 +196,7 @@ public class CodegenCLI extends CommandLineTool {
     writer.println("import java.util.Set;");
     writer.println("import java.util.HashSet;");
     writer.println("import org.vertexium.type.GeoPoint;");
+    writer.println("import org.visallo.core.model.properties.types.*;");
     writer.println("import " + BaseEntityBuilder.class.getName() + ";");
     writer.println("import " + BaseConceptBuilder.class.getName() + ";");
     writer.println("import " + BaseRelationshipBuilder.class.getName() + ";");
@@ -219,6 +220,7 @@ public class CodegenCLI extends CommandLineTool {
   protected void writePropertyMethods(PrintWriter writer, List<ClientApiOntology.Property> properties) {
     properties.stream().forEach(property -> {
       String upperCamelCasePropertyName = classNameFromIri(property.getTitle());
+      String constantName = constantNameFromClassName(upperCamelCasePropertyName);
 
       String propertyType = PropertyType.getTypeClass(property.getDataType()).getSimpleName();
       if (propertyType.equals("BigDecimal")) {
@@ -227,25 +229,35 @@ public class CodegenCLI extends CommandLineTool {
 
       String propertyAdditionType = PROPERTY_ADDITION_CLASS.getSimpleName() + "<" + propertyType + ">";
       String helperMethodName = propertyType.equals("byte[]") ? "addByteArrayProperty" : "add" + propertyType + "Property";
+      String visalloPropertyType = (propertyType.equals("byte[]") ? "ByteArray" : propertyType) + "VisalloProperty";
 
       writer.println();
+      writer.println("  public static final " + visalloPropertyType + " " + constantName + " = new " + visalloPropertyType + "(\"" + property.getTitle() + "\");");
       if (propertyType.equals("Date")) {
         writer.println("  public " + propertyAdditionType +
             " set" + upperCamelCasePropertyName + "(Object value, SimpleDateFormat dateFormat) { return add" + upperCamelCasePropertyName + "(\"\", value, dateFormat); }");
         writer.println("  public " + propertyAdditionType +
             " add" + upperCamelCasePropertyName + "(String key, Object value, SimpleDateFormat dateFormat)" +
-            " { return " + helperMethodName + "(\"" + property.getTitle() + "\", key, value, dateFormat); }");
+            " { return " + helperMethodName + "(" + constantName + ".getPropertyName(), key, value, dateFormat); }");
       } else {
         writer.println("  public " + propertyAdditionType +
             " set" + upperCamelCasePropertyName + "(Object value) { return add" + upperCamelCasePropertyName + "(\"\", value); }");
         writer.println("  public " + propertyAdditionType +
             " add" + upperCamelCasePropertyName + "(String key, Object value)" +
-            " { return " + helperMethodName + "(\"" + property.getTitle() + "\", key, value); }");
+            " { return " + helperMethodName + "(" + constantName + ".getPropertyName(), key, value); }");
       }
 
       LOGGER.debug("  %s property %s", propertyType, upperCamelCasePropertyName);
     });
   }
+
+  protected String constantNameFromClassName(String className) {
+    String[] classNameParts = StringUtils.splitByCharacterTypeCamelCase(className);
+    return Arrays.stream(classNameParts)
+        .map(String::toUpperCase)
+        .collect(Collectors.joining("_"));
+  }
+
 
   protected String classNameFromIri(String iri) {
     Matcher matcher = IRI_FORMAT.matcher(iri);
