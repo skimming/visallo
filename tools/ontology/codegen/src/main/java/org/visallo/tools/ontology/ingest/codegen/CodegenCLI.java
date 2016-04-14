@@ -76,9 +76,7 @@ public class CodegenCLI extends CommandLineTool {
     ClientApiOntology ontology = JsonUtil.getJsonMapper().readValue(ontologyJsonString, ClientApiOntology.class);
 
     Map<String, ClientApiOntology.Property> propertyMap = new HashMap<>();
-    ontology.getProperties().forEach(property -> {
-      propertyMap.put(property.getTitle(), property);
-    });
+    ontology.getProperties().forEach(property -> propertyMap.put(property.getTitle(), property));
 
     ontology.getConcepts().forEach(concept -> {
       try {
@@ -219,7 +217,7 @@ public class CodegenCLI extends CommandLineTool {
   }
 
   protected void writePropertyMethods(PrintWriter writer, List<ClientApiOntology.Property> properties) {
-    properties.stream().forEach(property -> {
+    properties.forEach(property -> {
       String upperCamelCasePropertyName = classNameFromIri(property.getTitle());
       String constantName = constantNameFromClassName(upperCamelCasePropertyName);
 
@@ -229,8 +227,8 @@ public class CodegenCLI extends CommandLineTool {
       }
 
       String propertyAdditionType = PROPERTY_ADDITION_CLASS.getSimpleName() + "<" + propertyType + ">";
-      String helperMethodName = propertyType.equals("byte[]") ? "addByteArrayProperty" : "add" + propertyType + "Property";
       String visalloPropertyType = (propertyType.equals("byte[]") ? "ByteArray" : propertyType) + "VisalloProperty";
+      String helperMethodName = propertyType.equals("byte[]") ? "addByteArrayProperty" : "add" + propertyType + "Property";
 
       writer.println();
       writer.println("  public static final " + visalloPropertyType + " " + constantName + " = new " + visalloPropertyType + "(\"" + property.getTitle() + "\");");
