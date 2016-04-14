@@ -203,10 +203,11 @@ public class CodegenCLI extends CommandLineTool {
     writer.println("import " + BaseEntityBuilder.class.getName() + "." + PROPERTY_ADDITION_CLASS.getSimpleName() + ";");
     writer.println();
     writer.println("public class " + className + " extends " + parentClass + " {");
+    writer.println("  public static final String IRI = \"" + iri + "\";");
     writer.println();
     writer.println("  public " + className + "(String id) { super(id); }");
     writer.println();
-    writer.println("  public String getIri() { return \"" + iri + "\"; }");
+    writer.println("  public String getIri() { return IRI; }");
 
     writePropertyMethods(writer, properties);
 
@@ -284,8 +285,8 @@ public class CodegenCLI extends CommandLineTool {
         packageParts = (String[]) ArrayUtils.addAll(packageParts, ArrayUtils.subarray(baseIriParts, 1, baseIriParts.length));
       }
 
-      String packageName = String.join(".", packageParts).toLowerCase();
-      if (packageName.equals("org.w3.www.2002.07.owl")) {
+      String packageName = String.join(".", packageParts);
+      if (packageName.toLowerCase().equals("org.w3.www.2002.07.owl")) {
         packageName = "org.w3.www.owl";
       }
       return packageName;
