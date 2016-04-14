@@ -53,7 +53,7 @@ public class CodegenCLI extends CommandLineTool {
   @Parameter(names = {"--visalloPassword", "-p"}, arity = 1)
   private String visalloPassword;
 
-  @Parameter(names = {"--outputDirectory", "-o"}, arity = 1)
+  @Parameter(names = {"--outputDirectory", "-o"}, arity = 1, required = true)
   private String outputDirectory;
 
   public static void main(String[] args) throws Exception {
@@ -117,7 +117,7 @@ public class CodegenCLI extends CommandLineTool {
           parentClass = packageNameFromIri(concept.getParentConcept()) + "." + classNameFromIri(concept.getParentConcept());
         }
 
-        List<ClientApiOntology.Property> properties = concept.getProperties().stream()
+        List<ClientApiOntology.Property> properties = concept.getProperties().stream().sorted()
             .map(propertyIri -> {
               ClientApiOntology.Property property = propertyMap.get(propertyIri);
               if (property == null) throw new VisalloException("Unable to locate property for iri: " + propertyIri);
@@ -143,7 +143,7 @@ public class CodegenCLI extends CommandLineTool {
       LOGGER.debug("Create relationship %s.%s", relationshipPackage, relationshipClassName);
 
       try (PrintWriter writer = createWriter(relationship.getTitle())) {
-        List<ClientApiOntology.Property> properties = relationship.getProperties().stream()
+        List<ClientApiOntology.Property> properties = relationship.getProperties().stream().sorted()
             .map(propertyIri -> {
               ClientApiOntology.Property property = propertyMap.get(propertyIri);
               if (property == null) throw new VisalloException("Unable to locate property for iri: " + propertyIri);
