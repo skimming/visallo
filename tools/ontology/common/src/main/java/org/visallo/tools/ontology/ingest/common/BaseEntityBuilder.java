@@ -218,8 +218,12 @@ public abstract class BaseEntityBuilder {
 
         @Override
         public boolean equals(final Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             return iri.equals(((PropertyAddition<?>) o).iri) && key.equals(((PropertyAddition<?>) o).key);
         }
 
