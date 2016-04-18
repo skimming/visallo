@@ -1,6 +1,6 @@
 package org.visallo.tools.ontology.ingest.common;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
@@ -184,27 +184,27 @@ public class IngestRepository {
       List<String> domainConceptIRIs = relationship.getDomainConceptIRIs();
       List<String> rangeConceptIRIs = relationship.getRangeConceptIRIs();
 
-      for (Method method : builder.getClass().getMethods()) {
-        if (method.getName().equals("setOutVertex")) {
-          Class paramType = method.getParameterTypes()[0];
-          String paramTypeIRI = (String) paramType.getField("IRI").get(null);
-          if (!domainConceptIRIs.contains(paramTypeIRI)) {
+      for (Constructor constructor : builder.getClass().getConstructors()) {
+        Class[] parameterTypes = constructor.getParameterTypes();
+        if (parameterTypes.length == 3) {
+          String outConceptIRI = (String) parameterTypes[1].getField("IRI").get(null);
+          if (!domainConceptIRIs.contains(outConceptIRI)) {
             if (save) {
-              throw new VisalloException("Out vertex Concept IRI: " + paramTypeIRI + " is invalid");
+              throw new VisalloException("Out vertex Concept IRI: " + outConceptIRI + " is invalid");
             } else {
               return false;
             }
           }
-        } else if (method.getName().equals("setInVertex")) {
-          Class paramType = method.getParameterTypes()[0];
-          String paramTypeIRI = (String) paramType.getField("IRI").get(null);
-          if (!rangeConceptIRIs.contains(paramTypeIRI)) {
+          String inConceptIRI = (String) parameterTypes[2].getField("IRI").get(null);
+          if (!rangeConceptIRIs.contains(inConceptIRI)) {
             if (save) {
-              throw new VisalloException("In vertex Concept IRI: " + paramTypeIRI + " is invalid");
+              throw new VisalloException("In vertex Concept IRI: " + inConceptIRI + " is invalid");
             } else {
               return false;
             }
           }
+        } else {
+          LOGGER.warn("Unsupported Constructor found: " + constructor.toString());
         }
       }
 
