@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import com.beust.jcommander.converters.FileConverter;
 import com.google.common.base.Strings;
 
@@ -35,25 +36,26 @@ import org.visallo.web.clientapi.VisalloApi;
 import org.visallo.web.clientapi.model.ClientApiOntology;
 import org.visallo.web.clientapi.model.PropertyType;
 
+@Parameters(commandDescription = "Generate model classes based on a Visallo ontology.")
 public class CodegenCLI extends CommandLineTool {
   private static final VisalloLogger LOGGER = VisalloLoggerFactory.getLogger(CodegenCLI.class);
   private static final Pattern IRI_FORMAT = Pattern.compile("^http://(.+)#(.+)$");
   private static final Pattern CLASSNAME_PART_MATCHER = Pattern.compile("^[a-zA-Z0-9]+$");
   private static final Class PROPERTY_ADDITION_CLASS = BaseEntityBuilder.PropertyAddition.class;
 
-  @Parameter(names = {"--inputJsonFile", "-f"}, arity = 1, converter = FileConverter.class)
+  @Parameter(names = {"--inputJsonFile", "-f"}, arity = 1, converter = FileConverter.class, description = "The path to a local json file containing the Visallo ontology.")
   private File inputJsonFile;
 
-  @Parameter(names = {"--visalloUrl", "-url"}, arity = 1)
+  @Parameter(names = {"--visalloUrl", "-url"}, arity = 1, description = "The root URL of the Visallo instance from which to download the ontology.")
   private String visalloUrl;
 
-  @Parameter(names = {"--visalloUsername", "-u"}, arity = 1)
+  @Parameter(names = {"--visalloUsername", "-u"}, arity = 1, description = "The username to authenticate as when downloading the ontology from the Visallo instance.")
   private String visalloUsername;
 
-  @Parameter(names = {"--visalloPassword", "-p"}, arity = 1)
+  @Parameter(names = {"--visalloPassword", "-p"}, arity = 1, description = "The password to authenticate with when downloading the ontology from the Visallo instance.")
   private String visalloPassword;
 
-  @Parameter(names = {"--outputDirectory", "-o"}, arity = 1, required = true)
+  @Parameter(names = {"--outputDirectory", "-o"}, arity = 1, required = true, description = "The path to the output directory for the class files. If it does not exist, it will be created.")
   private String outputDirectory;
 
   public static void main(String[] args) throws Exception {
@@ -80,7 +82,8 @@ public class CodegenCLI extends CommandLineTool {
 
     ontology.getConcepts().forEach(concept -> {
       try {
-        createConceptClass(concept, propertyMap);
+        List<ClientApiOntology.Property> conceptProperties = findPropertiesByIri(propertyMap, concept.getProperties());
+        createConceptClass(concept, conceptProperties);
       } catch (IOException ioe) {
         throw new VisalloException("Unable to create concept class", ioe);
       }
@@ -88,7 +91,8 @@ public class CodegenCLI extends CommandLineTool {
 
     ontology.getRelationships().forEach(relationship -> {
       try {
-        createRelationshipClass(relationship, propertyMap);
+        List<ClientApiOntology.Property> relationshipProperties = findPropertiesByIri(propertyMap, relationship.getProperties());
+        createRelationshipClass(relationship, relationshipProperties);
       } catch (IOException ioe) {
         throw new VisalloException("Unable to create concept class", ioe);
       }
@@ -97,7 +101,7 @@ public class CodegenCLI extends CommandLineTool {
     return 0;
   }
 
-  protected void createConceptClass(ClientApiOntology.Concept concept, Map<String, ClientApiOntology.Property> propertyMap) throws IOException {
+  protected void createConceptClass(ClientApiOntology.Concept concept, List<ClientApiOntology.Property> conceptProperties) throws IOException {
     String conceptPackage = packageNameFromIri(concept.getId());
     if (conceptPackage != null) {
       String conceptClassName = classNameFromIri(concept.getId());
@@ -109,85 +113,73 @@ public class CodegenCLI extends CommandLineTool {
 
       LOGGER.debug("Create concept %s.%s", conceptPackage, conceptClassName);
 
-      try (PrintWriter writer = createWriter(concept.getId())) {
+      try (PrintWriter writer = createWriter(conceptPackage, conceptClassName)) {
         String parentClass = BaseConceptBuilder.class.getSimpleName();
         if (!Strings.isNullOrEmpty(concept.getParentConcept())) {
           parentClass = packageNameFromIri(concept.getParentConcept()) + "." + classNameFromIri(concept.getParentConcept());
         }
 
-        List<ClientApiOntology.Property> properties = concept.getProperties().stream().sorted()
-            .map(propertyIri -> {
-              ClientApiOntology.Property property = propertyMap.get(propertyIri);
-              if (property == null) throw new VisalloException("Unable to locate property for iri: " + propertyIri);
-              return property;
-            })
-            .collect(Collectors.toList());
-
-        writeClass(writer, conceptPackage, conceptClassName, parentClass, concept.getId(), properties);
+        writeClass(writer, conceptPackage, conceptClassName, parentClass, concept.getId(), conceptProperties, null);
       }
     }
   }
 
-  protected void createRelationshipClass(ClientApiOntology.Relationship relationship, Map<String, ClientApiOntology.Property> propertyMap) throws IOException {
+  protected void createRelationshipClass(ClientApiOntology.Relationship relationship, List<ClientApiOntology.Property> relationshipProperties) throws IOException {
     String relationshipPackage = packageNameFromIri(relationship.getTitle());
     if (relationshipPackage != null) {
       String relationshipClassName = classNameFromIri(relationship.getTitle());
 
-      // Don't expose the visallo internal concepts to the generated code
+      // Don't expose the visallo internal relationships to the generated code
       if (relationshipPackage.startsWith("org.visallo")) {
         return;
       }
 
       LOGGER.debug("Create relationship %s.%s", relationshipPackage, relationshipClassName);
 
-      try (PrintWriter writer = createWriter(relationship.getTitle())) {
-        List<ClientApiOntology.Property> properties = relationship.getProperties().stream().sorted()
-            .map(propertyIri -> {
-              ClientApiOntology.Property property = propertyMap.get(propertyIri);
-              if (property == null) throw new VisalloException("Unable to locate property for iri: " + propertyIri);
-              return property;
-            })
-            .collect(Collectors.toList());
-
+      try (PrintWriter writer = createWriter(relationshipPackage, relationshipClassName)) {
         Consumer<PrintWriter> inOutMethods = methodWriter -> {
-          relationship.getDomainConceptIris().forEach(conceptIri -> {
-            String vertexClassName = packageNameFromIri(conceptIri) + "." + classNameFromIri(conceptIri);
-            methodWriter.println();
-            methodWriter.println("  public void setOutVertex(" + vertexClassName + " outVertex) { this.setOutVertexId(outVertex.getId()); } ");
-          });
-          relationship.getRangeConceptIris().forEach(conceptIri -> {
-            String vertexClassName = packageNameFromIri(conceptIri) + "." + classNameFromIri(conceptIri);
-            methodWriter.println();
-            methodWriter.println("  public void setInVertex(" + vertexClassName + " inVertex) { this.setInVertexId(inVertex.getId()); } ");
+          relationship.getDomainConceptIris().forEach(outConceptIri -> {
+            String outVertexClassName = packageNameFromIri(outConceptIri) + "." + classNameFromIri(outConceptIri);
+            relationship.getRangeConceptIris().forEach(inConceptIri -> {
+              String inVertexClassName = packageNameFromIri(inConceptIri) + "." + classNameFromIri(inConceptIri);
+              methodWriter.println();
+              methodWriter.println("  public " + relationshipClassName + "(String id, " + outVertexClassName + " outVertex, " + inVertexClassName + " inVertex) {");
+              methodWriter.println("    super(id);");
+              methodWriter.println("    this.setOutVertexId(outVertex.getId());");
+              methodWriter.println("    this.setInVertexId(inVertex.getId());");
+              methodWriter.println("  } ");
+            });
           });
         };
 
-        writeClass(writer, relationshipPackage, relationshipClassName, BaseRelationshipBuilder.class.getName(), relationship.getTitle(), properties, inOutMethods);
+        writeClass(writer, relationshipPackage, relationshipClassName, BaseRelationshipBuilder.class.getName(), relationship.getTitle(), relationshipProperties, inOutMethods);
       }
     }
   }
 
-  protected PrintWriter createWriter(String iri) throws IOException {
-    String conceptPackage = packageNameFromIri(iri);
-    if (conceptPackage != null) {
-      Path packagePath = Paths.get(outputDirectory, conceptPackage.replaceAll("\\.", "/"));
-      Files.createDirectories(packagePath);
+  protected PrintWriter createWriter(String packageName, String className) throws IOException {
+    Path packagePath = Paths.get(outputDirectory, packageName.replaceAll("\\.", "/"));
+    Files.createDirectories(packagePath);
 
-      String conceptClassName = classNameFromIri(iri);
-      Path conceptClassPath = packagePath.resolve(conceptClassName + ".java");
-      return new PrintWriter(Files.newBufferedWriter(conceptClassPath, Charset.forName("UTF-8")));
-    }
-    return null;
-  }
-  protected void writeClass(PrintWriter writer, String packageName, String className, String parentClass, String iri, List<ClientApiOntology.Property> properties) {
-    writeClass(writer, packageName, className, parentClass, iri, properties, null);
+    Path javaFileName = packagePath.resolve(className + ".java");
+    return new PrintWriter(Files.newBufferedWriter(javaFileName, Charset.forName("UTF-8")));
   }
 
-  protected void writeClass(PrintWriter writer, String packageName, String className, String parentClass, String iri, List<ClientApiOntology.Property> properties, Consumer<PrintWriter> additionalContentProvider) {
+  protected void writeClass(
+      PrintWriter writer,
+      String packageName,
+      String className,
+      String parentClass,
+      String iri,
+      List<ClientApiOntology.Property> properties,
+      Consumer<PrintWriter> constructorProvider) {
+
     writer.println("package " + packageName + ";");
     writer.println();
 
-    // Just in case we have a property that needs this
+    // A little heavy handed to include all of these,
+    // but it's simpler than trying to track which ones are actually needed
+    // TODO: Only included the required imports
     writer.println("import java.math.BigDecimal;");
     writer.println("import java.text.SimpleDateFormat;");
     writer.println("import java.util.Date;");
@@ -200,18 +192,19 @@ public class CodegenCLI extends CommandLineTool {
     writer.println("import " + BaseRelationshipBuilder.class.getName() + ";");
     writer.println("import " + BaseEntityBuilder.class.getName() + "." + PROPERTY_ADDITION_CLASS.getSimpleName() + ";");
     writer.println();
+
     writer.println("public class " + className + " extends " + parentClass + " {");
     writer.println("  public static final String IRI = \"" + iri + "\";");
     writer.println();
-    writer.println("  public " + className + "(String id) { super(id); }");
+    if (constructorProvider != null) {
+      constructorProvider.accept(writer);
+    } else {
+      writer.println("  public " + className + "(String id) { super(id); }");
+    }
     writer.println();
     writer.println("  public String getIri() { return IRI; }");
 
     writePropertyMethods(writer, properties);
-
-    if (additionalContentProvider != null) {
-      additionalContentProvider.accept(writer);
-    }
 
     writer.println('}');
   }
@@ -250,7 +243,17 @@ public class CodegenCLI extends CommandLineTool {
     });
   }
 
-  protected String constantNameFromClassName(String className) {
+  private List<ClientApiOntology.Property> findPropertiesByIri(Map<String, ClientApiOntology.Property> propertyMap, List<String> propertyIris) {
+    return propertyIris.stream().sorted()
+        .map(propertyIri -> {
+          ClientApiOntology.Property property = propertyMap.get(propertyIri);
+          if (property == null) throw new VisalloException("Unable to locate property for iri: " + propertyIri);
+          return property;
+        })
+        .collect(Collectors.toList());
+  }
+
+  private String constantNameFromClassName(String className) {
     String[] classNameParts = StringUtils.splitByCharacterTypeCamelCase(className);
     return Arrays.stream(classNameParts)
         .map(String::toUpperCase)
@@ -258,7 +261,7 @@ public class CodegenCLI extends CommandLineTool {
   }
 
 
-  protected String classNameFromIri(String iri) {
+  private String classNameFromIri(String iri) {
     Matcher matcher = IRI_FORMAT.matcher(iri);
     if (matcher.matches()) {
       String[] classNameParts = StringUtils.splitByCharacterTypeCamelCase(matcher.group(2));
@@ -272,7 +275,7 @@ public class CodegenCLI extends CommandLineTool {
     return null;
   }
 
-  protected String packageNameFromIri(String iri) {
+  private String packageNameFromIri(String iri) {
     Matcher matcher = IRI_FORMAT.matcher(iri);
     if (matcher.matches()) {
       String[] baseIriParts = matcher.group(1).split("/", -1);
