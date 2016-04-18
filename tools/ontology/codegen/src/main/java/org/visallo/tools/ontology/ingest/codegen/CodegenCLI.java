@@ -137,7 +137,7 @@ public class CodegenCLI extends CommandLineTool {
       LOGGER.debug("Create relationship %s.%s", relationshipPackage, relationshipClassName);
 
       try (PrintWriter writer = createWriter(relationshipPackage, relationshipClassName)) {
-        Consumer<PrintWriter> inOutMethods = methodWriter -> {
+        Consumer<PrintWriter> constructorWriter = methodWriter -> {
           relationship.getDomainConceptIris().forEach(outConceptIri -> {
             String outVertexClassName = packageNameFromIri(outConceptIri) + "." + classNameFromIri(outConceptIri);
             relationship.getRangeConceptIris().forEach(inConceptIri -> {
@@ -152,7 +152,7 @@ public class CodegenCLI extends CommandLineTool {
           });
         };
 
-        writeClass(writer, relationshipPackage, relationshipClassName, BaseRelationshipBuilder.class.getName(), relationship.getTitle(), relationshipProperties, inOutMethods);
+        writeClass(writer, relationshipPackage, relationshipClassName, BaseRelationshipBuilder.class.getName(), relationship.getTitle(), relationshipProperties, constructorWriter);
       }
     }
   }
