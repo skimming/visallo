@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 public class ClientApiOntology implements ClientApiObject {
     private List<Concept> concepts = new ArrayList<Concept>();
@@ -335,11 +335,11 @@ public class ClientApiOntology implements ClientApiObject {
             return displayFormula;
         }
 
+        @JsonSetter
         public void setDependentPropertyIris(String[] dependentPropertyIris) {
             this.dependentPropertyIris = dependentPropertyIris;
         }
 
-        @JsonIgnore
         public void setDependentPropertyIris(Collection<String> dependentPropertyIris) {
             if (dependentPropertyIris == null || dependentPropertyIris.size() == 0) {
                 this.dependentPropertyIris = null;
