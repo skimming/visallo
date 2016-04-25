@@ -137,9 +137,9 @@ public class CodegenCLI extends CommandLineTool {
 
             try (PrintWriter writer = createWriter(relationshipPackage, relationshipClassName)) {
                 Consumer<PrintWriter> constructorWriter = methodWriter -> {
-                    relationship.getDomainConceptIris().forEach(outConceptIri -> {
+                    relationship.getDomainConceptIris().stream().sorted().forEach(outConceptIri -> {
                         String outVertexClassName = packageNameFromIri(outConceptIri) + "." + classNameFromIri(outConceptIri);
-                        relationship.getRangeConceptIris().forEach(inConceptIri -> {
+                        relationship.getRangeConceptIris().stream().sorted().forEach(inConceptIri -> {
                             String inVertexClassName = packageNameFromIri(inConceptIri) + "." + classNameFromIri(inConceptIri);
                             methodWriter.println();
                             methodWriter.println("  public " + relationshipClassName + "(String id, " + outVertexClassName + " outVertex, " + inVertexClassName + " inVertex) {");
