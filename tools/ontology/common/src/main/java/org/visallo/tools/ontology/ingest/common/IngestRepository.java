@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Inject;
 import org.vertexium.*;
 import org.visallo.core.exception.VisalloException;
+import org.visallo.core.model.graph.GraphRepository;
 import org.visallo.core.model.ontology.Concept;
 import org.visallo.core.model.ontology.OntologyProperty;
 import org.visallo.core.model.ontology.OntologyRepository;
@@ -11,9 +12,11 @@ import org.visallo.core.model.ontology.Relationship;
 import org.visallo.core.model.properties.VisalloProperties;
 import org.visallo.core.model.user.UserRepository;
 import org.visallo.core.security.VisibilityTranslator;
+import org.visallo.core.user.User;
 import org.visallo.core.util.VisalloLogger;
 import org.visallo.core.util.VisalloLoggerFactory;
 import org.visallo.web.clientapi.model.PropertyType;
+import org.visallo.web.clientapi.model.VisibilityJson;
 
 import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
@@ -127,14 +130,13 @@ public class IngestRepository {
                 boolean valid = verifyClassProperty(entityBuilder, propertyAddition, save);
                 if (!valid) return false;
 
-                Visibility propertyVisibility = getVisibility(propertyAddition.getVisibility());
                 elementBuilder.addPropertyValue(
                         propertyAddition.getKey(),
                         propertyAddition.getIri(),
                         propertyAddition.getValue(),
-                        getMetadata(propertyAddition.getMetadata(), propertyVisibility),
+                        buildMetadata(propertyAddition.getMetadata(), propertyAddition.getVisibility()),
                         propertyAddition.getTimestamp(),
-                        propertyVisibility
+                        getVisibility(propertyAddition.getVisibility())
                 );
             }
         }
@@ -278,16 +280,28 @@ public class IngestRepository {
         return visibilitySource == null ? visibilityTranslator.getDefaultVisibility() : visibilityTranslator.toVisibility(visibilitySource).getVisibility();
     }
 
-    private Metadata getMetadata(Map<String, Object> map, Visibility visibility) {
+    private Metadata buildMetadata(Map<String, Object> map, String visibilitySource) {
+        Metadata metadata = new Metadata();
+
+        Date now = new Date();
+        Visibility defaultVisibility = visibilityTranslator.getDefaultVisibility();
+        VisalloProperties.MODIFIED_DATE_METADATA.setMetadata(metadata, now, defaultVisibility);
+        VisalloProperties.MODIFIED_BY_METADATA.setMetadata(metadata, getIngestUser().getUserId(), defaultVisibility);
+        VisalloProperties.CONFIDENCE_METADATA.setMetadata(metadata, GraphRepository.SET_PROPERTY_CONFIDENCE, defaultVisibility);
+        VisalloProperties.VISIBILITY_JSON_METADATA.setMetadata(metadata, new VisibilityJson(visibilitySource), defaultVisibility);
+
         if (map != null) {
-            Metadata metadata = new Metadata();
-            map.forEach((k, v) -> metadata.add(k, v, visibility));
-            return metadata;
+            map.forEach((k, v) -> metadata.add(k, v, defaultVisibility));
         }
-        return null;
+
+        return metadata;
     }
 
     private Authorizations getAuthorizations() {
-        return userRepository.getAuthorizations(userRepository.getSystemUser());
+        return userRepository.getAuthorizations(getIngestUser());
+    }
+
+    private User getIngestUser() {
+        return userRepository.getSystemUser();
     }
 }
