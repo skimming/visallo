@@ -128,7 +128,9 @@ public class IngestRepository {
         for (BaseEntityBuilder.PropertyAddition<?> propertyAddition : entityBuilder.getPropertyAdditions()) {
             if (propertyAddition.getValue() != null) {
                 boolean valid = verifyClassProperty(entityBuilder, propertyAddition, save);
-                if (!valid) return false;
+                if (!valid) {
+                    return false;
+                }
 
                 elementBuilder.addPropertyValue(
                         propertyAddition.getKey(),
@@ -150,11 +152,8 @@ public class IngestRepository {
 
         Concept concept = ontologyRepository.getConceptByIRI(builder.getIri());
         if (concept == null) {
-            if (save) {
-                throw new VisalloException("Concept class: " + builder.getClass().getName() + " IRI: " + builder.getIri() + " is invalid");
-            } else {
-                return false;
-            }
+            logOrThrowError(save, "Concept class: " + builder.getClass().getName() + " IRI: " + builder.getIri() + " is invalid");
+            return false;
         }
 
         verifiedClasses.add(builder.getClass());
@@ -169,11 +168,8 @@ public class IngestRepository {
         try {
             Relationship relationship = ontologyRepository.getRelationshipByIRI(builder.getIri());
             if (relationship == null) {
-                if (save) {
-                    throw new VisalloException("Relationship class: " + builder.getClass().getName() + " IRI: " + builder.getIri() + " is invalid");
-                } else {
-                    return false;
-                }
+                logOrThrowError(save, "Relationship class: " + builder.getClass().getName() + " IRI: " + builder.getIri() + " is invalid");
+                return false;
             }
             List<String> domainConceptIRIs = relationship.getDomainConceptIRIs();
             List<String> rangeConceptIRIs = relationship.getRangeConceptIRIs();
@@ -183,19 +179,13 @@ public class IngestRepository {
                 if (parameterTypes.length == 3) {
                     String outConceptIRI = (String) parameterTypes[1].getField("IRI").get(null);
                     if (!domainConceptIRIs.contains(outConceptIRI)) {
-                        if (save) {
-                            throw new VisalloException("Out vertex Concept IRI: " + outConceptIRI + " is invalid");
-                        } else {
-                            return false;
-                        }
+                        logOrThrowError(save, "Out vertex Concept IRI: " + outConceptIRI + " is invalid");
+                        return false;
                     }
                     String inConceptIRI = (String) parameterTypes[2].getField("IRI").get(null);
                     if (!rangeConceptIRIs.contains(inConceptIRI)) {
-                        if (save) {
-                            throw new VisalloException("In vertex Concept IRI: " + inConceptIRI + " is invalid");
-                        } else {
-                            return false;
-                        }
+                        logOrThrowError(save, "In vertex Concept IRI: " + inConceptIRI + " is invalid");
+                        return false;
                     }
                 } else {
                     LOGGER.warn("Unsupported Constructor found: " + constructor.toString());
@@ -224,18 +214,12 @@ public class IngestRepository {
         if (entityBuilder instanceof BaseConceptBuilder) {
             Concept concept = ontologyRepository.getConceptByIRI(entityBuilder.getIri());
             if (!isPropertyValidForConcept(concept, property)) {
-                if (save) {
-                    throw new VisalloException("Property: " + propertyAddition.getIri() + " is invalid for Concept class (or its ancestors): " + entityBuilder.getClass().getName());
-                } else {
-                    return false;
-                }
+                logOrThrowError(save, "Property: " + propertyAddition.getIri() + " is invalid for Concept class (or its ancestors): " + entityBuilder.getClass().getName());
+                return false;
             }
             if (!valueType.isAssignableFrom(propertyType)) {
-                if (save) {
-                    throw new VisalloException("Property: " + propertyAddition.getIri() + " type: " + valueType.getSimpleName() + " is invalid for Concept class: " + entityBuilder.getClass().getName());
-                } else {
-                    return false;
-                }
+                logOrThrowError(save, "Property: " + propertyAddition.getIri() + " type: " + valueType.getSimpleName() + " is invalid for Concept class: " + entityBuilder.getClass().getName());
+                return false;
             }
             verifiedClassProperties.add(getKey(entityBuilder, propertyAddition));
             return true;
@@ -243,18 +227,12 @@ public class IngestRepository {
         } else if (entityBuilder instanceof BaseRelationshipBuilder) {
             Relationship relationship = ontologyRepository.getRelationshipByIRI(entityBuilder.getIri());
             if (!relationship.getProperties().contains(property)) {
-                if (save) {
-                    throw new VisalloException("Property: " + propertyAddition.getIri() + " is invalid for Relationship class: " + entityBuilder.getClass().getName());
-                } else {
-                    return false;
-                }
+                logOrThrowError(save, "Property: " + propertyAddition.getIri() + " is invalid for Relationship class: " + entityBuilder.getClass().getName());
+                return false;
             }
             if (!valueType.isAssignableFrom(propertyType)) {
-                if (save) {
-                    throw new VisalloException("Property: " + propertyAddition.getIri() + " type: " + valueType.getSimpleName() + " is invalid for Relationship class: " + entityBuilder.getClass().getName());
-                } else {
-                    return false;
-                }
+                logOrThrowError(save, "Property: " + propertyAddition.getIri() + " type: " + valueType.getSimpleName() + " is invalid for Relationship class: " + entityBuilder.getClass().getName());
+                return false;
             }
             verifiedClassProperties.add(getKey(entityBuilder, propertyAddition));
             return true;
@@ -295,6 +273,13 @@ public class IngestRepository {
         }
 
         return metadata;
+    }
+
+    private void logOrThrowError(boolean save, String message) {
+        if (save) {
+            throw new VisalloException(message);
+        }
+        LOGGER.error(message);
     }
 
     private Authorizations getAuthorizations() {

@@ -1,6 +1,7 @@
 package org.visallo.tools.ontology.ingest.common;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import org.vertexium.type.GeoPoint;
 import org.visallo.core.exception.VisalloException;
 
@@ -54,7 +55,7 @@ public abstract class BaseEntityBuilder {
         String strValue = null;
         if (value != null) {
             strValue = value.toString();
-            strValue = strValue.trim().length() > 0 ? strValue : null;
+            strValue = Strings.isNullOrEmpty(strValue) ? null : strValue;
         }
         return addTo(iri, key, strValue);
     }
@@ -67,7 +68,7 @@ public abstract class BaseEntityBuilder {
             } else {
                 String strValue = value.toString();
                 try {
-                    dateValue = strValue.trim().length() > 0 ? dateFormat.parse(strValue) : null;
+                    dateValue = Strings.isNullOrEmpty(strValue) ? null : dateFormat.parse(strValue.trim());
                 } catch (ParseException pe) {
                     throw new VisalloException("Unable to parse date: " + strValue, pe);
                 }
@@ -94,7 +95,7 @@ public abstract class BaseEntityBuilder {
             if (value instanceof Boolean) {
                 booleanValue = (Boolean) value;
             } else {
-                booleanValue = Boolean.valueOf(value.toString());
+                booleanValue = Boolean.valueOf(value.toString().trim());
             }
         }
         return addTo(iri, key, booleanValue);
@@ -104,7 +105,10 @@ public abstract class BaseEntityBuilder {
         Double doubleValue = null;
         if (value != null) {
             if (value instanceof String) {
-                doubleValue = Double.valueOf((String) value);
+                String strValue = (String) value;
+                if (!Strings.isNullOrEmpty(strValue)) {
+                    doubleValue = Double.valueOf(strValue.trim());
+                }
             } else if (value instanceof Integer) {
                 doubleValue = ((Integer) value).doubleValue();
             } else {
@@ -118,7 +122,10 @@ public abstract class BaseEntityBuilder {
         Integer intValue = null;
         if (value != null) {
             if (value instanceof String) {
-                intValue = Integer.valueOf((String) value);
+                String strValue = (String) value;
+                if (!Strings.isNullOrEmpty(strValue)) {
+                    intValue = Integer.valueOf(strValue.trim());
+                }
             } else if (value instanceof Double) {
                 intValue = ((Double) value).intValue();
             } else {
@@ -132,7 +139,10 @@ public abstract class BaseEntityBuilder {
         Long longValue = null;
         if (value != null) {
             if (value instanceof String) {
-                longValue = Long.valueOf((String) value);
+                String strValue = (String) value;
+                if (!Strings.isNullOrEmpty(strValue)) {
+                    longValue = Long.valueOf(strValue.trim());
+                }
             } else if (value instanceof Integer) {
                 longValue = ((Integer) value).longValue();
             } else if (value instanceof Double) {
@@ -167,10 +177,8 @@ public abstract class BaseEntityBuilder {
         private String visibility;
 
         public PropertyAddition(String iri, String key, T value) {
-            assert iri != null;
-            assert iri.trim().length() > 0;
-            assert key != null;
-            assert key.trim().length() > 0;
+            assert !Strings.isNullOrEmpty(iri);
+            assert !Strings.isNullOrEmpty(key);
 
             this.iri = iri;
             this.key = key;
