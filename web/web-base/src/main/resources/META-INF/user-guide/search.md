@@ -1,6 +1,17 @@
-# Search
+#<center> Search </center>
 
-{{ book.productName }} includes two search interfaces by default:
+<img src = images/search-bar.png width="300" height="100">
+
+{{ book.productName }} provides two methods of searching by default:
 
 - [{{ book.productName }} Search](visallo-search.md)
-- [Workspace Filtering](workspace-filtering.md)
+- [Find On Graph](workspace-filtering.md)
+
+To search, click the `Find` option <img src = images/menubar-find.png width="30" height="40"> in the menubar.
+Searches can help find information you are looking for or view other things that would be in the system that you wouldn’t
+know about.
+
+For example, if another user creates an entity and publishes it, you can find that published entity in search. A `*`
+search can be executed to view any and all results that are in the system.  If an entity has a specified authorization,
+then any user without that authorization can not see the entity also while they are searching.
+

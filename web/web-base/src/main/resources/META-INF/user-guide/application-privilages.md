@@ -1,24 +1,23 @@
-# Application Privileges
+#<center>Application Privileges </center>
 
-Access to different {{ book.productName }} functions is dependant on which application
-privileges you have been granted. You can view your privileges buy
-clicking on your name in the lower left corner.
+Access to different {{ book.productName }} functions is dependent on which application privileges you
+have been granted. You can view your privileges by clicking on your username in the lower left corner.
 
-![username status area](images/username-status-area.png)
+<img src = images/username-bottom-left.png width="250" height="50">
 
-{{ book.productName }} defines the following application privilages:
+{{ book.productName }} defines the following application privileges:
 
-READ
-: the ability to login and view data (limited by [Data Access Control](data-access-control.md))
+`READ` : The ability to login and view data (limited by [access control](data-access-control.md))
 
-COMMENT
-: the ability to annotate [Vertices](vertices.md) and [Edges](edges.md) with threaded comments
+`COMMENT` : The ability to annotate [entities](vertices.md) and [relationships](edges.md) with threaded comments
 
-EDIT
-: the ability to create and modify [Vertices](vertices.md), [Edges](edges.md), and [Properties](properties.md) within a [Workspace](workspaces.md) [Sandbox](sandboxing.md)
+`EDIT` : The ability to create and modify [entities](vertices.md), [relationships](edges.md), and [properties](properties.md)
+within a [workspace](workspaces.md) [sandbox](sandboxing-and-publishing.md)
 
-PUBLISH
-: the ability to commit and share [Workspace](workspaces.md) [Sandbox](sandboxing.md) changes with all users (limited by [Data Access Control](data-access-control.md))
+`PUBLISH` : The ability to commit and share [workspace](workspaces.md) [sandbox](sandboxing-and-publishing.md) changes
+with all users (limited by [access control](data-access-control.md))
 
-ADMIN
-: the ability to access administrative features via the web interface
+`ADMIN` : The ability to access administrative features via the web interface
+
+
+<img src = images/user-account.png width="500" height="500">

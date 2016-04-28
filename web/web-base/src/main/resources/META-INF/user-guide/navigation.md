@@ -1,31 +1,31 @@
-# Navigation
+#<center> Navigation </center>
 
 The vertical bar along the left side of the screen provides access to many of {{ book.productName }}'s features.
 
-- "V"
-    - access the [Dashboard](dashboards.md) for the current [Workspace](workspaces.md)
+ <img src = images/menubar-visallo-logo.png width="30" height="40">   {{ book.productName }}  Logo
+ - Provides access the [dashboard](dashboards.md) for the current [workspace](workspaces.md).
 
-- Find
-    - open the [Search](search.md) panel to run new or saved search
+<img src = images/menubar-find.png width="30" height="40">   Find
+ - Opens the [search](search.md) panel to run new or saved search. Within the search panel you can also can run
+ [searches](search.md) specific to the [workspace](workspaces.md)
 
-- Spaces
-    - open the [Workspaces](workspaces.md) panel to switch to or create a different workspace
+<img src = images/menubar-spaces.png width="30" height="40">  Spaces
+ - Opens the [workspace](workspaces.md) panel which displays a list of workspaces. It also allows you to switch to
+ another workspace, create, delete and/or share a [workspace](workspaces.md) with another user
 
-- Activity
-    - indicates that {{ book.productName }} is currently saving your changes, open to show information about long running processes
+<img src = images/menubar-graph.png width="30" height="40">   Graph
+ - Opens the [workspace](workspaces.md) graph to visualize and manage [entities](vertices.md) and [relationships](edges.md).
 
-- Logout
-    - sign out of {{ book.productName }} and return to the user login screen
+<img src = images/menubar-map.png width="30" height="40">   Map
+ - Opens the [map](map.md) where you can analyze [entities](vertices.md) based on their geo-coordinates.
+
+<img src = images/menubar-activity.png width="30" height="40">   Activity
+ - Opens the activity panel to show the status of your changes to the data as well as [paths](find-path.md)
+ found between [entities](vertices.md)
+
+<img src = images/menubar-logout.png width="30" height="40">  Logout
+ - Logs you out of {{ book.productName }} and returns to the user login screen
 
 
-The bottom left corner of the workspace includes the following information:
-
-- User Name
-    - open the [User Account](user-account.md) window to view your privileges and authorizations
-- Workspace Name
-- the number of sandboxed changes
-    - open to show the [Unpublished Changes](unpublished-changes.md) window to view changes to publish or undo
-- Timeline
-    - open the [Workspace Timeline](workspace-timeline.md) panel to visualize
 
 {{ book.productName }} supports many keyboard shortcuts that can be shown by typing: `?`
