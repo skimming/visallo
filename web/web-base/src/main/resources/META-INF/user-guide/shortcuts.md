@@ -1,18 +1,18 @@
 #<center> Shortcuts </center>
 
-| **MAC Shortcuts** | **Windows Shortcuts** | **Description** |
+| **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 | ? | ? | This will open up all the shortcuts. |
 
 ##{{ book.productName }}  Shortcuts
-| **MAC Shortcuts** | **Windows Shortcuts** | **Description** |
+| **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 |{{ book.productName }}  Shortcuts | | |
 | OPTION + L   | ALT + L  |  Logs you out of {{ book.productName }} |
 
 
 ##Search Shortcuts
-| **MAC Shortcuts** | **Windows Shortcuts** | **Description** |
+| **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 | /  | /  | [Search](search.md) panel or toggle the [search](search.md) type. |
 | OPTION + R  |  ALT + R | Adds the related items to the [workspace](workspaces.md).  |
@@ -22,7 +22,7 @@
 
 
 ##Graph Shortcuts
-| **MAC Shortcuts** | **Windows Shortcuts** | **Description** |
+| **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 | -  |  - | Zooms out of the graph  |
 | =  |  = | Zooms in the graph  |
@@ -42,7 +42,7 @@
 
 
 ##Map Shortcuts
-| **MAC Shortcuts** | **Windows Shortcuts** | **Description** |
+| **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 | -  |  - | This will zoom out of the graph  |
 | =  |  = | This will zoom in the graph  |
@@ -60,13 +60,13 @@
 
 
 ##Activity Shortcuts
-| **MAC Shortcuts** | **Windows Shortcuts** | **Description** |
+| **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 | OPTION + A  | ALT + A  |  Show/hide the activity panel |
 
 
 ##Help Shortcuts
-| **MAC Shortcuts** | **Windows Shortcuts** | **Description** |
+| **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 | ESC  |  ESC | Closes all open panes and deselects objects  |
 | SHIFT + /  | SHIFT + /  |  Toggles this help dialog.  |
