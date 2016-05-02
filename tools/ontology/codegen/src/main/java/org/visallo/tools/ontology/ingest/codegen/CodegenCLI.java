@@ -10,9 +10,10 @@ import org.visallo.core.cmdline.CommandLineTool;
 import org.visallo.core.exception.VisalloException;
 import org.visallo.core.util.VisalloLogger;
 import org.visallo.core.util.VisalloLoggerFactory;
-import org.visallo.tools.ontology.ingest.common.BaseConceptBuilder;
-import org.visallo.tools.ontology.ingest.common.BaseEntityBuilder;
-import org.visallo.tools.ontology.ingest.common.BaseRelationshipBuilder;
+import org.visallo.tools.ontology.ingest.common.ConceptBuilder;
+import org.visallo.tools.ontology.ingest.common.EntityBuilder;
+import org.visallo.tools.ontology.ingest.common.RelationshipBuilder;
+import org.visallo.tools.ontology.ingest.common.PropertyAddition;
 import org.visallo.web.clientapi.JsonUtil;
 import org.visallo.web.clientapi.UserNameAndPasswordVisalloApi;
 import org.visallo.web.clientapi.VisalloApi;
@@ -40,7 +41,7 @@ public class CodegenCLI extends CommandLineTool {
     private static final VisalloLogger LOGGER = VisalloLoggerFactory.getLogger(CodegenCLI.class);
     private static final Pattern IRI_FORMAT = Pattern.compile("^http://(.+)#(.+)$");
     private static final Pattern CLASSNAME_PART_MATCHER = Pattern.compile("^[a-zA-Z0-9]+$");
-    private static final Class PROPERTY_ADDITION_CLASS = BaseEntityBuilder.PropertyAddition.class;
+    private static final Class PROPERTY_ADDITION_CLASS = PropertyAddition.class;
 
     @Parameter(names = {"--inputJsonFile", "-f"}, arity = 1, converter = FileConverter.class, description = "The path to a local json file containing the Visallo ontology.")
     private File inputJsonFile;
@@ -113,7 +114,7 @@ public class CodegenCLI extends CommandLineTool {
             LOGGER.debug("Create concept %s.%s", conceptPackage, conceptClassName);
 
             try (PrintWriter writer = createWriter(conceptPackage, conceptClassName)) {
-                String parentClass = BaseConceptBuilder.class.getSimpleName();
+                String parentClass = ConceptBuilder.class.getSimpleName();
                 if (!Strings.isNullOrEmpty(concept.getParentConcept())) {
                     parentClass = packageNameFromIri(concept.getParentConcept()) + "." + classNameFromIri(concept.getParentConcept());
                 }
@@ -151,7 +152,7 @@ public class CodegenCLI extends CommandLineTool {
                     });
                 };
 
-                writeClass(writer, relationshipPackage, relationshipClassName, BaseRelationshipBuilder.class.getName(), relationship.getTitle(), relationshipProperties, constructorWriter);
+                writeClass(writer, relationshipPackage, relationshipClassName, RelationshipBuilder.class.getName(), relationship.getTitle(), relationshipProperties, constructorWriter);
             }
         }
     }
@@ -186,10 +187,10 @@ public class CodegenCLI extends CommandLineTool {
         writer.println("import java.util.HashSet;");
         writer.println("import org.vertexium.type.GeoPoint;");
         writer.println("import org.visallo.core.model.properties.types.*;");
-        writer.println("import " + BaseEntityBuilder.class.getName() + ";");
-        writer.println("import " + BaseConceptBuilder.class.getName() + ";");
-        writer.println("import " + BaseRelationshipBuilder.class.getName() + ";");
-        writer.println("import " + BaseEntityBuilder.class.getName() + "." + PROPERTY_ADDITION_CLASS.getSimpleName() + ";");
+        writer.println("import " + EntityBuilder.class.getName() + ";");
+        writer.println("import " + ConceptBuilder.class.getName() + ";");
+        writer.println("import " + RelationshipBuilder.class.getName() + ";");
+        writer.println("import " + PROPERTY_ADDITION_CLASS.getName() + ";");
         writer.println();
 
         writer.println("public class " + className + " extends " + parentClass + " {");

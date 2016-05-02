@@ -1,6 +1,5 @@
 package org.visallo.tools.ontology.ingest.common;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import org.vertexium.type.GeoPoint;
 import org.visallo.core.exception.VisalloException;
@@ -12,13 +11,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class BaseEntityBuilder {
+public abstract class EntityBuilder {
     private String id;
-    private String visibility;
-    private Long timestamp;
     private Set<PropertyAddition<?>> propertyAdditions = new HashSet<>();
+    private Map<String, Object> metadata;
+    private Long timestamp;
+    private String visibility;
 
-    public BaseEntityBuilder(String id) {
+    public EntityBuilder(String id) {
         assert id != null;
         assert id.trim().length() > 0;
 
@@ -29,26 +29,37 @@ public abstract class BaseEntityBuilder {
         return id;
     }
 
-    public String getVisibility() {
-        return visibility;
+    public abstract String getIri();
+
+    public Set<PropertyAddition<?>> getPropertyAdditions() {
+        return propertyAdditions;
     }
 
-    public void setVisibility(String visibility) {
+    public EntityBuilder withMetadata(Map<String, Object> metdata) {
+        this.metadata = metdata;
+        return this;
+    }
+
+    public EntityBuilder withTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+        return this;
+    }
+
+    public EntityBuilder withVisibility(String visibility) {
         this.visibility = visibility;
+        return this;
+    }
+
+    public Map<String, Object> getMetadata() {
+        return metadata;
     }
 
     public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(final Long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public abstract String getIri();
-
-    public Set<PropertyAddition<?>> getPropertyAdditions() {
-        return propertyAdditions;
+    public String getVisibility() {
+        return visibility;
     }
 
     protected PropertyAddition<String> addStringProperty(String iri, String key, Object value) {
@@ -168,76 +179,4 @@ public abstract class BaseEntityBuilder {
         return addition;
     }
 
-    public class PropertyAddition<T> {
-        private String iri;
-        private T value;
-        private String key;
-        private Map<String, Object> metadata;
-        private Long timestamp;
-        private String visibility;
-
-        public PropertyAddition(String iri, String key, T value) {
-            assert !Strings.isNullOrEmpty(iri);
-            assert !Strings.isNullOrEmpty(key);
-
-            this.iri = iri;
-            this.key = key;
-            this.value = value;
-        }
-
-        public PropertyAddition withMetadata(Map<String, Object> metdata) {
-            this.metadata = metdata;
-            return this;
-        }
-
-        public PropertyAddition withTimestamp(Long timestamp) {
-            this.timestamp = timestamp;
-            return this;
-        }
-
-        public PropertyAddition withVisibility(String visibility) {
-            this.visibility = visibility;
-            return this;
-        }
-
-        public String getIri() {
-            return iri;
-        }
-
-        public T getValue() {
-            return value;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public Map<String, Object> getMetadata() {
-            return metadata;
-        }
-
-        public Long getTimestamp() {
-            return timestamp;
-        }
-
-        public String getVisibility() {
-            return visibility;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            return iri.equals(((PropertyAddition<?>) o).iri) && key.equals(((PropertyAddition<?>) o).key);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(iri, key);
-        }
-    }
 }

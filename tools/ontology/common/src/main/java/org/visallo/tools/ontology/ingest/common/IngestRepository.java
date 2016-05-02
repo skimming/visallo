@@ -33,6 +33,37 @@ public class IngestRepository {
     private Set<Class> verifiedClasses = new HashSet<>();
     private Set<String> verifiedClassProperties = new HashSet<>();
 
+    private Map<String, Object> defaultMetadata;
+    private Long defaultTimestamp;
+    private Visibility defaultVisibility;
+
+    public IngestRepository withDefaultMetadata(Map<String, Object> metdata) {
+        this.defaultMetadata = metdata;
+        return this;
+    }
+
+    public IngestRepository withDefaultTimestamp(Long timestamp) {
+        this.defaultTimestamp = timestamp;
+        return this;
+    }
+
+    public IngestRepository withDefaultVisibility(String visibility) {
+        this.defaultVisibility = visibilityTranslator.toVisibility(visibility).getVisibility();
+        return this;
+    }
+
+    public Map<String, Object> getDefaultMetadata() {
+        return defaultMetadata;
+    }
+
+    public Long getDefaultTimestamp() {
+        return defaultTimestamp;
+    }
+
+    public Visibility getDefaultVisibility() {
+        return defaultVisibility;
+    }
+
     @Inject
     public IngestRepository(
             Graph graph,
@@ -46,38 +77,38 @@ public class IngestRepository {
         this.ontologyRepository = ontologyRepository;
     }
 
-    public boolean validate(BaseConceptBuilder builder) {
+    public boolean validate(ConceptBuilder builder) {
         return save(builder, false);
     }
 
-    public boolean validate(BaseRelationshipBuilder builder) {
+    public boolean validate(RelationshipBuilder builder) {
         return save(builder, false);
     }
 
-    public void save(BaseEntityBuilder... builders) {
+    public void save(EntityBuilder... builders) {
         save(Arrays.asList(builders));
     }
 
-    public void save(Collection<BaseEntityBuilder> builders) {
+    public void save(Collection<EntityBuilder> builders) {
         LOGGER.debug("Saving %d entities", builders.size());
-        for (BaseEntityBuilder builder : builders) {
-            if (builder instanceof BaseConceptBuilder) {
-                if (!save((BaseConceptBuilder) builder, false)) {
+        for (EntityBuilder builder : builders) {
+            if (builder instanceof ConceptBuilder) {
+                if (!save((ConceptBuilder) builder, false)) {
                     throw new VisalloException("Concept class: " + builder.getClass().getName() + " failed validation");
                 }
-            } else if (builder instanceof BaseRelationshipBuilder) {
-                if (!save((BaseRelationshipBuilder) builder, false)) {
+            } else if (builder instanceof RelationshipBuilder) {
+                if (!save((RelationshipBuilder) builder, false)) {
                     throw new VisalloException("Relationship class: " + builder.getClass().getName() + " failed validation");
                 }
             } else {
                 throw new VisalloException("Unexpected type: " + builder.getClass().getName());
             }
         }
-        for (BaseEntityBuilder builder : builders) {
-            if (builder instanceof BaseConceptBuilder) {
-                save((BaseConceptBuilder) builder, true);
+        for (EntityBuilder builder : builders) {
+            if (builder instanceof ConceptBuilder) {
+                save((ConceptBuilder) builder, true);
             } else {
-                save((BaseRelationshipBuilder) builder, true);
+                save((RelationshipBuilder) builder, true);
             }
         }
     }
@@ -86,11 +117,11 @@ public class IngestRepository {
         graph.flush();
     }
 
-    private boolean save(BaseConceptBuilder conceptBuilder, boolean save) {
+    private boolean save(ConceptBuilder conceptBuilder, boolean save) {
         boolean valid = verifyConcept(conceptBuilder, save);
         if (valid) {
             Visibility conceptVisibility = getVisibility(conceptBuilder.getVisibility());
-            VertexBuilder vertexBuilder = graph.prepareVertex(conceptBuilder.getId(), conceptBuilder.getTimestamp(), getVisibility(conceptBuilder.getVisibility()));
+            VertexBuilder vertexBuilder = graph.prepareVertex(conceptBuilder.getId(), getTimestamp(conceptBuilder.getTimestamp()), conceptVisibility);
             vertexBuilder.setProperty(VisalloProperties.CONCEPT_TYPE.getPropertyName(), conceptBuilder.getIri(), conceptVisibility);
 
             valid = addProperties(vertexBuilder, conceptBuilder, save);
@@ -102,7 +133,7 @@ public class IngestRepository {
         return valid;
     }
 
-    private boolean save(BaseRelationshipBuilder relationshipBuilder, boolean save) {
+    private boolean save(RelationshipBuilder relationshipBuilder, boolean save) {
         boolean valid = verifyRelationship(relationshipBuilder, save);
         if (valid) {
             Visibility relationshipVisibility = getVisibility(relationshipBuilder.getVisibility());
@@ -111,7 +142,7 @@ public class IngestRepository {
                     relationshipBuilder.getOutVertexId(),
                     relationshipBuilder.getInVertexId(),
                     relationshipBuilder.getIri(),
-                    relationshipBuilder.getTimestamp(),
+                    getTimestamp(relationshipBuilder.getTimestamp()),
                     relationshipVisibility
             );
 
@@ -124,8 +155,8 @@ public class IngestRepository {
         return valid;
     }
 
-    private boolean addProperties(ElementBuilder elementBuilder, BaseEntityBuilder entityBuilder, boolean save) {
-        for (BaseEntityBuilder.PropertyAddition<?> propertyAddition : entityBuilder.getPropertyAdditions()) {
+    private boolean addProperties(ElementBuilder elementBuilder, EntityBuilder entityBuilder, boolean save) {
+        for (PropertyAddition<?> propertyAddition : entityBuilder.getPropertyAdditions()) {
             if (propertyAddition.getValue() != null) {
                 boolean valid = verifyClassProperty(entityBuilder, propertyAddition, save);
                 if (!valid) {
@@ -137,7 +168,7 @@ public class IngestRepository {
                         propertyAddition.getIri(),
                         propertyAddition.getValue(),
                         buildMetadata(propertyAddition.getMetadata(), propertyAddition.getVisibility()),
-                        propertyAddition.getTimestamp(),
+                        getTimestamp(propertyAddition.getTimestamp()),
                         getVisibility(propertyAddition.getVisibility())
                 );
             }
@@ -145,7 +176,7 @@ public class IngestRepository {
         return true;
     }
 
-    private boolean verifyConcept(BaseConceptBuilder builder, boolean save) {
+    private boolean verifyConcept(ConceptBuilder builder, boolean save) {
         if (verifiedClasses.contains(builder.getClass())) {
             return true;
         }
@@ -160,7 +191,7 @@ public class IngestRepository {
         return true;
     }
 
-    private boolean verifyRelationship(BaseRelationshipBuilder builder, boolean save) {
+    private boolean verifyRelationship(RelationshipBuilder builder, boolean save) {
         if (verifiedClasses.contains(builder.getClass())) {
             return true;
         }
@@ -199,7 +230,7 @@ public class IngestRepository {
         }
     }
 
-    private boolean verifyClassProperty(BaseEntityBuilder entityBuilder, BaseEntityBuilder.PropertyAddition propertyAddition, boolean save) {
+    private boolean verifyClassProperty(EntityBuilder entityBuilder, PropertyAddition propertyAddition, boolean save) {
         if (verifiedClassProperties.contains(getKey(entityBuilder, propertyAddition))) {
             return true;
         }
@@ -211,7 +242,7 @@ public class IngestRepository {
         }
         Class<?> valueType = propertyAddition.getValue().getClass();
 
-        if (entityBuilder instanceof BaseConceptBuilder) {
+        if (entityBuilder instanceof ConceptBuilder) {
             Concept concept = ontologyRepository.getConceptByIRI(entityBuilder.getIri());
             if (!isPropertyValidForConcept(concept, property)) {
                 logOrThrowError(save, "Property: " + propertyAddition.getIri() + " is invalid for Concept class (or its ancestors): " + entityBuilder.getClass().getName());
@@ -224,7 +255,7 @@ public class IngestRepository {
             verifiedClassProperties.add(getKey(entityBuilder, propertyAddition));
             return true;
 
-        } else if (entityBuilder instanceof BaseRelationshipBuilder) {
+        } else if (entityBuilder instanceof RelationshipBuilder) {
             Relationship relationship = ontologyRepository.getRelationshipByIRI(entityBuilder.getIri());
             if (!relationship.getProperties().contains(property)) {
                 logOrThrowError(save, "Property: " + propertyAddition.getIri() + " is invalid for Relationship class: " + entityBuilder.getClass().getName());
@@ -250,12 +281,26 @@ public class IngestRepository {
         return true;
     }
 
-    private String getKey(BaseEntityBuilder entityBuilder, BaseEntityBuilder.PropertyAddition propertyAddition) {
+    private String getKey(EntityBuilder entityBuilder, PropertyAddition propertyAddition) {
         return entityBuilder.getIri() + ":" + propertyAddition.getIri();
     }
 
+    private Long getTimestamp(Long timestamp) {
+        if (timestamp != null) {
+            return timestamp;
+        } else if (defaultTimestamp != null) {
+            return defaultTimestamp;
+        }
+        return null;
+    }
+
     private Visibility getVisibility(String visibilitySource) {
-        return visibilitySource == null ? visibilityTranslator.getDefaultVisibility() : visibilityTranslator.toVisibility(visibilitySource).getVisibility();
+        if (visibilitySource != null) {
+            return visibilityTranslator.toVisibility(visibilitySource).getVisibility();
+        } else if (defaultVisibility != null) {
+            return defaultVisibility;
+        }
+        return visibilityTranslator.getDefaultVisibility();
     }
 
     private Metadata buildMetadata(Map<String, Object> map, String visibilitySource) {
@@ -267,6 +312,10 @@ public class IngestRepository {
         VisalloProperties.MODIFIED_BY_METADATA.setMetadata(metadata, getIngestUser().getUserId(), defaultVisibility);
         VisalloProperties.CONFIDENCE_METADATA.setMetadata(metadata, GraphRepository.SET_PROPERTY_CONFIDENCE, defaultVisibility);
         VisalloProperties.VISIBILITY_JSON_METADATA.setMetadata(metadata, new VisibilityJson(visibilitySource), defaultVisibility);
+
+        if (defaultMetadata != null) {
+            defaultMetadata.forEach((k, v) -> metadata.add(k, v, defaultVisibility));
+        }
 
         if (map != null) {
             map.forEach((k, v) -> metadata.add(k, v, defaultVisibility));

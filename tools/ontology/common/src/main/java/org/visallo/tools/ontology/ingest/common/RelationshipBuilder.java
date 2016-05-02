@@ -1,10 +1,10 @@
 package org.visallo.tools.ontology.ingest.common;
 
-public abstract class BaseRelationshipBuilder extends BaseEntityBuilder {
+public abstract class RelationshipBuilder extends EntityBuilder {
     private String inVertexId;
     private String outVertexId;
 
-    public BaseRelationshipBuilder(final String id) {
+    public RelationshipBuilder(final String id) {
         super(id);
     }
 
