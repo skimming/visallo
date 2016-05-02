@@ -26,7 +26,7 @@ Options in the Hamburger Menu by default includes `Delete Entity`, however if ad
 options may appear, this also applies to `Add` and `Open`.
 
 
-<img src = images/entity-detail-panel.png width="300" height="600">
+<img src = images/entity-detail-panel.png width="300">
 
 
 #Relationships Details Panel
@@ -43,7 +43,7 @@ Options for the `ADD` drop down includes `Comment`.
 Options in the Hamburger Menu by default includes `Delete Entity`, however if additional plugins are utilized, more menu
 options may appear, this also applies to `Add` and `Open`.
 
-<img src = images/relationship-details-panel.png width="300" height="600">
+<img src = images/relationship-details-panel.png width="300">
 
 
 #Multi Selection Histogram
@@ -58,7 +58,7 @@ Options for the `OPEN` drop down includes `Full Screen` and `Previously Viewed`.
    - `Previously Viewed`: Provides a list of [entities](vertices.md)**/**[relationships](edges.md) that were
    recently viewed.
 
-<img src = images/multi-selection-histogram.png width="300" height="600">
+<img src = images/multi-selection-histogram.png width="300">
 
 <!--
 TODO:

@@ -13,4 +13,4 @@ click on the other entity to create the relationship. Relationships vary dependi
 the ontology.
 
 
-<img src = images/entity-right-click.png width="350" height="400">
+<img src = images/entity-right-click.png width="350">

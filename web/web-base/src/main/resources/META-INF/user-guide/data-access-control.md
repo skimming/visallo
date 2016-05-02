@@ -23,7 +23,7 @@ to that entity, and gives that the “auth1” visibility. Now the entity can be
 because they both have the “auth1” authorization.
 
 
-<img src = images/importing-entity.png width="250" height="200">
+<img src = images/importing-entity.png width="250">
 
 <!--
 TODO:

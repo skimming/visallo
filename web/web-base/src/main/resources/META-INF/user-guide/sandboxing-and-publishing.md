@@ -31,4 +31,4 @@ An option to `UNDO` exists to ‘undo’ the changes that are
 made. Once a change is undone, it cannot be reverted.
 
 
-<img src = images/diff-panel.png width="500" height="400">
+<img src = images/diff-panel.png width="500">

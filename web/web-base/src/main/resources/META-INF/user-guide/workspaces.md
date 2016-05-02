@@ -1,6 +1,6 @@
 #<center> Workspaces </center>
 
-A workspace can be found by clicking on the `Spaces` tab <img src = images/menubar-spaces.png width="30" height="40"> on the
+A workspace can be found by clicking on the `Spaces` tab <img src = images/menubar-spaces.png width="30"> on the
 menu bar. It is a collection consisting of a [graph](graph.md), [dashboard](dashboard.md) and a [map](map.md).
 The [graph](graph.md) is a working area that includes a collection of [entities](vertices.md) and [relationships](edges.md) that can be
 shared to improve [collaboration](colaboration.md) with other {{ book.productName }}  users. Note that new and changed [entities](vertices.md),
@@ -15,7 +15,7 @@ then another default workspace will be present. The name of a workspace can be e
 workspace is [sandboxed](sandboxing-and-publishing.md).
 
 
-<img src = images/workspace-collaboration.png width="400" height="600">
+<img src = images/workspace-collaboration.png width="400">
 
 
 #Sharing a Workspace
@@ -36,7 +36,7 @@ With `Edit` access, you can view the data, change the layout, and make changes b
 [properties](properties.md)**/**[entities](vertices.md)**/**[relationships](edges.md) as if you are the original
 owner of the workspace that is shared with you.
 
-<img src = images/editing-workspace.png width="600" height="400">
+<img src = images/editing-workspace.png width="600">
 
 
 
@@ -45,7 +45,7 @@ The bottom left corner of the workspace includes the following information:
 - User Name
     - Open the user account window to view your [privileges](application-privilages.md) and [authorizations](data-access-control.md)
 
-<img src = images/user-account.png width="600" height="400">
+<img src = images/user-account.png width="600">
 
 - [Workspace](workspaces.md) Name
 - Modification Panel

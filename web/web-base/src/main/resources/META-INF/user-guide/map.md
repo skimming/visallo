@@ -21,7 +21,7 @@ select the option to “[search](search.md) on map” and then highlight a certa
 the highlighted radius.
 
 
-<img src = images/map.png width="600" height="300">
+<img src = images/map.png width="600">
 
 
 <!--

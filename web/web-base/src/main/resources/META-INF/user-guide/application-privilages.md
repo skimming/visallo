@@ -3,7 +3,7 @@
 Access to different {{ book.productName }} functions is dependent on which application privileges you
 have been granted. You can view your privileges by clicking on your username in the lower left corner.
 
-<img src = images/username-bottom-left.png width="250" height="50">
+<img src = images/username-bottom-left.png width="250">
 
 {{ book.productName }} defines the following application privileges:
 
@@ -20,4 +20,4 @@ with all users (limited by [access control](data-access-control.md))
 `ADMIN` : The ability to access administrative features via the web interface
 
 
-<img src = images/user-account.png width="500" height="500">
+<img src = images/user-account.png width="500">

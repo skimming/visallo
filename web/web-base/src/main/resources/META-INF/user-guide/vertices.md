@@ -8,6 +8,6 @@ Depending on the concept type of the entity, there is a specific list of possibl
 entities, and a specific list of [properties](properties.md) that can be used.  Also there are different icons that are
 used to represent each concept type.
 
-<img src = images/create-entity.png width="300" height="200">
+<img src = images/create-entity.png width="300">
 
-<img src = images/graph-layout.png width="600" height="300">
+<img src = images/graph-layout.png width="600">

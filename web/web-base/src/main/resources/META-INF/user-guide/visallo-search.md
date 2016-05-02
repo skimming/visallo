@@ -51,7 +51,7 @@ on the graph, right click to display the menu options and select `Search...`. Th
 then appear with all the results of all the entities that are related.
 
 
-<img src = images/filled-out-search.png width="400" height="600">
+<img src = images/filled-out-search.png width="400">
 
 <!--
 TODO:

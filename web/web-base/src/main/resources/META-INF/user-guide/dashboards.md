@@ -15,21 +15,21 @@ Subway, Text Overview, and Pie Chart. The different Dashboard Cards that exist b
    and will provide an option to open the list in the [search](search.md) panel. Configurations for this dashboard card
    includes just changing the title and the visualization.
 
-<img src = images/entity-counts.png width="400" height="200">
+<img src = images/entity-counts.png width="400">
 
 **Notifications**
    - The Notifications dashboard card contains a list of any system notifications that are pertinent to you or any other
    notifications that require your attention such as change in authorizations, or if a workspace is shared with you.
    Configurations for this dashboard card is the ability to edit the title.
 
-<img src = images/system-notification-dashboard-card.png width="600" height="175">
+<img src = images/system-notification-dashboard-card.png width="600">
 
 **Relationship Counts**
    - The Relationship Counts dashboard card starts as a vertical bar chart and is similar to the entity counts
    dashboard card. It displays the number of [relationships](edges.md) that there are in the system for that
    [workspace](workspaces.md) as per their relationship types.
 
-<img src = images/relationship-counts.png width="500" height="200">
+<img src = images/relationship-counts.png width="500">
 
 **Welcome to {{ book.productName }}**
 
@@ -37,7 +37,7 @@ Subway, Text Overview, and Pie Chart. The different Dashboard Cards that exist b
      information about the [menubar](navigation.md) and describes each item, such as the dashboard, find, spaces, admin,
      graph, map, activity and logout options depending on your privileges.
 
-<img src = images/welcome-to-visallo.png width="725" height="500">
+<img src = images/welcome-to-visallo.png width="725">
 
 **Saved [Search](search.md)**
    - The Saved [Search](search.md) dashboard card provides the ability to customize the way you view a saved search using
@@ -55,7 +55,7 @@ Subway, Text Overview, and Pie Chart. The different Dashboard Cards that exist b
         - If you choose Geo-coordinate Cluster, you would have to enter the [property](properties.md) as well as a size
           that is measured in kilometers. Lastly, for Statistics, you will input the [property](properties.md) to count.
 
-<img src = images/saved-search.png width="500" height="500">
+<img src = images/saved-search.png width="500">
 
 <!--
 TODO:

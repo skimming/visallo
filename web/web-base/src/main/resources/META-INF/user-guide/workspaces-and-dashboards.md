@@ -13,4 +13,4 @@ the `PUBLISH` [privilege](application-privilages.md).
 Each {{ book.productName }} [workspace](workspaces.md) has an associated dashboard that can be customized to display
 information.
 
-<img src = images/dashboard.png width="700" height="400">
+<img src = images/dashboard.png width="700">

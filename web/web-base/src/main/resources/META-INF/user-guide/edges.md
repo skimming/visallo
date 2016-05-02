@@ -8,4 +8,4 @@ representation of what anyone else would be reading on a table or notes. Example
 {{ book.productName }}  include, but are not limited to: `Contains Image of`, `Has Entity`, `Has Met`, `Has Image`,
 `Knows` and `Works For`.
 
-<img src = images/entity-relationship.png width="300" height="400">
+<img src = images/entity-relationship.png width="300">

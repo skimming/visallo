@@ -1,13 +1,13 @@
 #<center> Search </center>
 
-<img src = images/search-bar.png width="300" height="100">
+<img src = images/search-bar.png width="300">
 
 {{ book.productName }} provides two methods of searching by default:
 
 - [{{ book.productName }} Search](visallo-search.md)
 - [Find On Graph](workspace-filtering.md)
 
-To search, click the `Find` option <img src = images/menubar-find.png width="30" height="40"> in the menubar.
+To search, click the `Find` option <img src = images/menubar-find.png width="30"> in the menubar.
 Searches can help find information you are looking for or view other things that would be in the system that you wouldn’t
 know about.
 

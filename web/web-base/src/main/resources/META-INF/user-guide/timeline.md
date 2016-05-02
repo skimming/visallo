@@ -13,4 +13,4 @@ display all the dates within that time  period and by clicking and dragging on t
 
 
 
-<img src = images/timeline.png width="700" height="150">
+<img src = images/timeline.png width="700">

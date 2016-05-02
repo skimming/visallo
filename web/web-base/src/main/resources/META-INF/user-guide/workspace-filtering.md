@@ -10,4 +10,4 @@ As an added benefit, any entities and/or relationships that are highlighted as a
 the [histogram](detail-pane.md), providing additional insights to your data.
 
 
-<img src = images/find-on-graph.png width="600" height="300">
+<img src = images/find-on-graph.png width="600">

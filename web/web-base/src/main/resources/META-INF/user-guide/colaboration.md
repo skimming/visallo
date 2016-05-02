@@ -7,10 +7,10 @@ To view the list of users the workspace is shared with, click on the "Spaces" ic
  to the workspace name. If you have `Edit` [access](data-access-control.md) to that [workspace](workspaces.md), you may
  modify the list of users.
 
-<img src = images/workspace-name.png width="300" height="75">
+<img src = images/workspace-name.png width="300">
 
 
-<img src = images/workspace-collaboration.png width="400" height="600">
+<img src = images/workspace-collaboration.png width="400">
 
 After a [workspace](workspaces.md) is shared with you and depending on your access to the [workspace](workspaces.md), you
 can add comments or change the [properties](properties.md) of the [entities](vertices.md) and [relationships](edges.md)

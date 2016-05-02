@@ -22,4 +22,4 @@ search. The activity panel will open labeling “X Paths Found”. By clicking o
 highlighted in different colors between Person A and Person Z.
 
 
-<img src = images/find-path.png width="700" height="400">
+<img src = images/find-path.png width="700">

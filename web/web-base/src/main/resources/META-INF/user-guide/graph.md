@@ -15,17 +15,17 @@ Viewing large amounts of data on a graph can be overwhelming. To improve the use
 provides several options to navigate the contents.
 
 
-Fit <img src = images/fit.png width="35" height="25">:  resets your view and arranges the graph so that all entities are
+Fit <img src = images/fit.png width="35">:  resets your view and arranges the graph so that all entities are
 visible on the graph.
 
-Zoom <img src = images/zoom.png width="50" height="35">: Using the '+' or '-' keys on your keyboard allow you to zoom in/out.
+Zoom <img src = images/zoom.png width="50">: Using the '+' or '-' keys on your keyboard allow you to zoom in/out.
  Alternatively, you can use your mouse/track pad to zoom in/out.
 
-Arrows: <img src = images/pan-arrows.png width="50" height="45">: Using the arrow keys on the graph allows you to
+Arrows: <img src = images/pan-arrows.png width="50">: Using the arrow keys on the graph allows you to
 pan up, down, left, or right.
 
 #Changing Display On the Graph
-The hamburger menu <img src = images/hamburger-menu.png width="25" height="25"> found on the top right of the screen
+The hamburger menu <img src = images/hamburger-menu.png width="25"> found on the top right of the screen
 provides you with the options enable/disable Snap to Grid and/or Edge Labels.
   - Snap to Grid: Promotes entity placement alignment on the graph through the use of an invisible
   grid. When enabling “Snap To Grid”, all the entities on the graph will align themselves to the nearest intersection of lines on the grid.
@@ -44,7 +44,7 @@ may use the `Invert` option.
 You may also opt to choose `Layout` to layout everything that is on the graph.
 
 
-<img src = images/full-graph.png width="600" height="400">
+<img src = images/full-graph.png width="600">
 
 <!--
 TODO:
