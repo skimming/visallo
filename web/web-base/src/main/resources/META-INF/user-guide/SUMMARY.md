@@ -11,7 +11,7 @@
 * [Detail Panel](detail-pane.md)
 * [Security](security.md)
     * [Access Control](data-access-control.md)
-    * [Application Privileges](application-privilages.md)
+    * [Application Privileges](application-privileges.md)
 * [Workspaces and Dashboards](workspaces-and-dashboards.md)
     * [Workspaces](workspaces.md)
     * [Collaboration](collaboration.md)

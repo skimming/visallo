@@ -5,7 +5,7 @@ menu bar. It is a collection consisting of a [graph](graph.md), [dashboard](dash
 The [graph](graph.md) is a working area that includes a collection of [entities](vertices.md) and [relationships](edges.md) that can be
 shared to improve [collaboration](collaboration.md) with other {{ book.productName }}  users. Note that new and changed [entities](vertices.md),
 [properties](properties.md), and [relationships](edges.md) are only visible within a workspace until it is published
-by a user with the `PUBLISH` [privilege](application-privilages.md).
+by a user with the `PUBLISH` [privilege](application-privileges.md).
 
 ## Naming, Creating, and Deleting Workspaces
 
@@ -41,7 +41,7 @@ owner of the workspace that is shared with you.
 The bottom left corner of the workspace includes the following information:
 
 - User Name
-    - Open the user account window to view your [privileges](application-privilages.md) and [authorizations](data-access-control.md)
+    - Open the user account window to view your [privileges](application-privileges.md) and [authorizations](data-access-control.md)
 
 <img src = images/user-account.png width="600">
 

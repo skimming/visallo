@@ -6,7 +6,7 @@ A named collection of [entities](vertices.md) and [relationships](edges.md) that
  [collaboration](collaboration.md) with
 other {{ book.productName }} users. New and changed [entities](vertices.md), [properties](properties.md), and [relationships](edges.md)
 are only visible within a [workspace](workspaces.md) until it is published by a user with
-the `PUBLISH` [privilege](application-privilages.md).
+the `PUBLISH` [privilege](application-privileges.md).
 
 ## Dashboards
 

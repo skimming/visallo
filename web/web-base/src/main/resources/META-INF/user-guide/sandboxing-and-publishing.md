@@ -7,9 +7,9 @@ changed data and answer hypothetical "what-if" questions without impacting all u
 
 
 ## Publish
-Users with the `PUBLISH` [privilege](application-privilages.md) can promote data from the [sandbox](sandboxing-and-publishing.md)
+Users with the `PUBLISH` [privilege](application-privileges.md) can promote data from the [sandbox](sandboxing-and-publishing.md)
 to be seen by all users (limited by [data access control](data-access-control.md)). Users with the `PUBLISH`
-[privilege](application-privilages.md) are also able to `UNDO` changes that are made.
+[privilege](application-privileges.md) are also able to `UNDO` changes that are made.
 
 For example, if an image is on the
 [workspace](workspaces.md) and a new 'title' [property](properties.md) is added to the image, you have the option to
