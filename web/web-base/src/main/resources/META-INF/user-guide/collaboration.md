@@ -18,7 +18,7 @@ for other users to reply to or view.
 
 
 ## Collaborating Without a Workspace
-[Collaboration](colaboration.md) is also possible even when a [workspace](workspaces.md) is not shared through
+[Collaboration](collaboration.md) is also possible even when a [workspace](workspaces.md) is not shared through
 [sandboxing](sandboxing-and-publishing.md).
 
 

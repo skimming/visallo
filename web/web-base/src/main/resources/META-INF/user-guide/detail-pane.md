@@ -9,9 +9,9 @@
 `Download`.
 
    - `Full Screen`: Opens the the details panel in another tab in fullscreen.
-   - `Original`:  Opens the original entity in its native format. (NOTE: This is for `Raw` [entities](verticies.md) such
+   - `Original`:  Opens the original entity in its native format. (NOTE: This is for `Raw` [entities](vertices.md) such
    as Documents, Images, etc.)
-   - `Download`: Downloads the entity on your device. (NOTE: This is for `Raw` [entities](verticies.md) such
+   - `Download`: Downloads the entity on your device. (NOTE: This is for `Raw` [entities](vertices.md) such
    as Documents, Images, etc.)
    - `Previously Viewed`: Provides a list of [entities](vertices.md)**/**[relationships](edges.md) that were
    recently viewed.

@@ -5,7 +5,7 @@
 {{ book.productName }} provides two methods of searching by default:
 
 - [{{ book.productName }} Search](visallo-search.md)
-- [Find On Graph](workspace-filtering.md)
+- [Find On Graph](find-on-graph.md)
 
 To search, click the `Find` option <img src = images/menubar-find.png width="30"> in the menubar.
 Searches can help find information you are looking for or view other things that would be in the system that you wouldn’t

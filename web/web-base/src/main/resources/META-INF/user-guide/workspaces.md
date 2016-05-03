@@ -1,9 +1,9 @@
 # Workspaces
 
 A workspace can be found by clicking on the `Spaces` tab <img src = images/menubar-spaces.png width="30"> on the
-menu bar. It is a collection consisting of a [graph](graph.md), [dashboard](dashboard.md) and a [map](map.md).
+menu bar. It is a collection consisting of a [graph](graph.md), [dashboard](dashboards.md) and a [map](map.md).
 The [graph](graph.md) is a working area that includes a collection of [entities](vertices.md) and [relationships](edges.md) that can be
-shared to improve [collaboration](colaboration.md) with other {{ book.productName }}  users. Note that new and changed [entities](vertices.md),
+shared to improve [collaboration](collaboration.md) with other {{ book.productName }}  users. Note that new and changed [entities](vertices.md),
 [properties](properties.md), and [relationships](edges.md) are only visible within a workspace until it is published
 by a user with the `PUBLISH` [privilege](application-privilages.md).
 

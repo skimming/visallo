@@ -1,7 +1,7 @@
 # Sandboxing and Publishing
 
 ## Sandboxing
-Sandboxing is a core feature of {{ book.productName }} where users can [collaborate](colaboration.md) with each other within the
+Sandboxing is a core feature of {{ book.productName }} where users can [collaborate](collaboration.md) with each other within the
 safety of a [sandboxed](sandboxing-and-publishing.md) [workspace](workspaces.md). This allows them to explore added and
 changed data and answer hypothetical "what-if" questions without impacting all users of the system.
 
