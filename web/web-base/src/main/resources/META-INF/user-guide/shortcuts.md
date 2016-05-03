@@ -1,17 +1,17 @@
-#<center> Shortcuts </center>
+# Shortcuts
 
 | **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 | ? | ? | This will open up all the shortcuts. |
 
-##{{ book.productName }}  Shortcuts
+## {{ book.productName }}  Shortcuts
 | **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 |{{ book.productName }}  Shortcuts | | |
 | OPTION + L   | ALT + L  |  Logs you out of {{ book.productName }} |
 
 
-##Search Shortcuts
+## Search Shortcuts
 | **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 | /  | /  | [Search](search.md) panel or toggle the [search](search.md) type. |
@@ -21,7 +21,7 @@
 |  CONTROL + OPTION + R | CTRL + ALT + R  | Requeues a entity.  |
 
 
-##Graph Shortcuts
+## Graph Shortcuts
 | **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 | -  |  - | Zooms out of the graph  |
@@ -41,7 +41,7 @@
 | COMMAND + E  | CTRL + E  |  Selects all connected entities |
 
 
-##Map Shortcuts
+## Map Shortcuts
 | **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 | -  |  - | This will zoom out of the graph  |
@@ -59,13 +59,13 @@
 | COMMAND + E  | CTRL + E  |  Selects all connected entities |
 
 
-##Activity Shortcuts
+## Activity Shortcuts
 | **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 | OPTION + A  | ALT + A  |  Show/hide the activity panel |
 
 
-##Help Shortcuts
+## Help Shortcuts
 | **OS X Shortcuts** | **Windows Shortcuts** | **Description** |
 | -- | -- | -- |
 | ESC  |  ESC | Closes all open panes and deselects objects  |

@@ -1,4 +1,4 @@
-#<center> Workspaces </center>
+# Workspaces
 
 A workspace can be found by clicking on the `Spaces` tab <img src = images/menubar-spaces.png width="30"> on the
 menu bar. It is a collection consisting of a [graph](graph.md), [dashboard](dashboard.md) and a [map](map.md).
@@ -7,24 +7,22 @@ shared to improve [collaboration](colaboration.md) with other {{ book.productNam
 [properties](properties.md), and [relationships](edges.md) are only visible within a workspace until it is published
 by a user with the `PUBLISH` [privilege](application-privilages.md).
 
-#Naming, Creating, and Deleting Workspaces
+## Naming, Creating, and Deleting Workspaces
 
 Every workspace will always have a default workspace that is named “default - *username*”. Therefore if all workspaces are deleted
 then another default workspace will be present. The name of a workspace can be edited at any time by any user with 'Edit'
  access to the workspace, however, two workspaces may not have the same name. Each
 workspace is [sandboxed](sandboxing-and-publishing.md).
 
-
 <img src = images/workspace-collaboration.png width="400">
 
-
-#Sharing a Workspace
+## Sharing a Workspace
 When a workspace is created and then shared, you can grant another user one of the following accesses:
 `View`, `Comment`, or `Edit`.  Also, within a shared workspace, if [authorizations](data-access-control.md) are used, only users with the appropriate authorizations
  will be able to view the [entities](vertices.md)**/**[relationships](edges.md) assigned with the appropriate
   [visibility](data-access-control.md).
 
-#Access on Workspaces
+## Access on Workspaces
 With `View` access,  you can only view the data on the workspace that is shared with you. You will not have the permissions to
 change the layout or data.
 

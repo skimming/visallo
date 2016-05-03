@@ -1,4 +1,4 @@
-#<center> Entities </center>
+# Entities
 
 As one of the three types of data in {{ book.productName }}, entities are nodes in the graph that can have
 [properties](properties.md) and [relationships](edges.md) to other entities. These entities exist to represent the

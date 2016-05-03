@@ -1,4 +1,4 @@
-#<center> {{ book.productName }} Concepts </center>
+# {{ book.productName }} Concepts
 
 {{ book.productName }} has three types of data:
 
@@ -11,6 +11,5 @@ connected to one another through [relationships](edges.md), where both have [pro
 they are. To connect two entities, right click on one of the entities, and select the `Connect` menu option, and then
 click on the other entity to create the relationship. Relationships vary depending on the concept types defined on
 the ontology.
-
 
 <img src = images/entity-right-click.png width="350">

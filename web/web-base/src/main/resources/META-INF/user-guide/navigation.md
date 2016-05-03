@@ -1,4 +1,4 @@
-#<center> Navigation </center>
+# Navigation
 
 The vertical bar along the left side of the screen provides access to many of {{ book.productName }}'s features.
 

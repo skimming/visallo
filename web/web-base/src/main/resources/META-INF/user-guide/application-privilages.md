@@ -1,4 +1,4 @@
-#<center>Application Privileges </center>
+# Application Privileges
 
 Access to different {{ book.productName }} functions is dependent on which application privileges you
 have been granted. You can view your privileges by clicking on your username in the lower left corner.

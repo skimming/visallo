@@ -1,4 +1,4 @@
-#<center> Access Control </center>
+# Access Control
 
 Access to data in {{ book.productName }} is controlled at the individual [entity](vertices.md), [relationship](edges.md),
 and [property](properties.md) level. Additionally, there are two concepts that enable data to be protected and users to

@@ -1,16 +1,16 @@
-#<center> Graph </center>
+# Graph
 
 The [workspace](workspaces.md) graph is the primary method used to visualize and interact with the [relationships](edges.md)
 between [entities](vertices.md); both [entities](vertices.md) and [relationships](edges.md) can be viewed and manipulated
  on the graph, as well as any paths that are [searched](search.md) for and found.
 
 
-#Adding to the Graph
+## Adding to the Graph
 To create new entities, right click on the graph and select `New Entity`. Then choose the concept type
 that you would like to create. Alternatively, entities can be imported by dragging and dropping entities onto the graph.
 
 
-#Fitting, Panning, and Zooming the Graph
+## Fitting, Panning, and Zooming the Graph
 Viewing large amounts of data on a graph can be overwhelming. To improve the user experiences, Visallo
 provides several options to navigate the contents.
 
@@ -24,7 +24,7 @@ Zoom <img src = images/zoom.png width="50">: Using the '+' or '-' keys on your k
 Arrows: <img src = images/pan-arrows.png width="50">: Using the arrow keys on the graph allows you to
 pan up, down, left, or right.
 
-#Changing Display On the Graph
+## Changing Display On the Graph
 The hamburger menu <img src = images/hamburger-menu.png width="25"> found on the top right of the screen
 provides you with the options enable/disable Snap to Grid and/or Edge Labels.
   - Snap to Grid: Promotes entity placement alignment on the graph through the use of an invisible

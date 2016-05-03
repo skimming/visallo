@@ -1,12 +1,12 @@
-#<center> Sandboxing and Publishing </center>
+# Sandboxing and Publishing
 
-#Sandboxing
+## Sandboxing
 Sandboxing is a core feature of {{ book.productName }} where users can [collaborate](colaboration.md) with each other within the
 safety of a [sandboxed](sandboxing-and-publishing.md) [workspace](workspaces.md). This allows them to explore added and
 changed data and answer hypothetical "what-if" questions without impacting all users of the system.
 
 
-#Publish
+## Publish
 Users with the `PUBLISH` [privilege](application-privilages.md) can promote data from the [sandbox](sandboxing-and-publishing.md)
 to be seen by all users (limited by [data access control](data-access-control.md)). Users with the `PUBLISH`
 [privilege](application-privilages.md) are also able to `UNDO` changes that are made.
@@ -19,7 +19,7 @@ undone include but are not limited to: adding or deleting [properties](propertie
 [entities](vertices.md), etc.
 
 
-#Modification Panel
+## Modification Panel
 The Modification Panel can be found in the bottom of the graph and it displays all of the changes that exist in the
 [workspace](workspaces.md); each change is listed under the name of the changed [entity](vertices.md)**/**[relationship](edges.md).
 These changes are not visible to any user until the `PUBLISH` option is used, which is only available to those with the
@@ -29,6 +29,5 @@ the system.
 If there is a new entity that was either created or added, publishing it will enable other users to view, comment, or edit it.
 An option to `UNDO` exists to ‘undo’ the changes that are
 made. Once a change is undone, it cannot be reverted.
-
 
 <img src = images/diff-panel.png width="500">

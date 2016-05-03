@@ -1,6 +1,6 @@
-#<center> Collaboration  </center>
+# Collaboration
 
-#Collaboration with a Workspace
+## Collaboration with a Workspace
 
 {{ book.productName }} allows multiple users to collaborate on the same [workspace](workspaces.md) much like Google Docs.
 To view the list of users the workspace is shared with, click on the "Spaces" icon on the menubar and click on the gear next
@@ -17,7 +17,7 @@ can add comments or change the [properties](properties.md) of the [entities](ver
 for other users to reply to or view.
 
 
-# Collaborating Without a Workspace
+## Collaborating Without a Workspace
 [Collaboration](colaboration.md) is also possible even when a [workspace](workspaces.md) is not shared through
 [sandboxing](sandboxing-and-publishing.md).
 

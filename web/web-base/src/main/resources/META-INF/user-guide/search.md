@@ -1,4 +1,4 @@
-#<center> Search </center>
+# Search
 
 <img src = images/search-bar.png width="300">
 

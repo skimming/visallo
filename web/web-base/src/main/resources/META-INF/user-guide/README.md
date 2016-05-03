@@ -1,8 +1,6 @@
-#<center> Welcome To {{ book.productName }} </center>
+![Image](images/visallo-banner.png)
 
-Welcome to the world of {{ book.productName }} where your data provides answers.
-
-   As the volume of data we collect has continued to grow, so too has the challenge of figuring out how best to leverage
+As the volume of data we collect has continued to grow, so too has the challenge of figuring out how best to leverage
 it. The problem has shifted from not having enough data to having too much, which is putting a strain on analysts and
 investigators who need to make sense of everything. That's why we built {{ book.productName }}.
 
@@ -29,5 +27,3 @@ problems**. The foundational motivations behind {{ book.productName }} are
     vendor lock-in, to provide insight into the code base, and to facilitate the development of new plugins to quickly
     bring enhanced functionality to the platform.
 
-
-![Image](images/login-screen.png)

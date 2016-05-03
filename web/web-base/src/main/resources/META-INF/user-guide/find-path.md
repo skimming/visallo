@@ -1,9 +1,9 @@
-#<center> Find Path </center>
+# Find Path
 
 Find path is powerful feature used to explore and discover details about distinct [entities](vertices.md) on
 the graph and how they may be related to each other.
 
-#How To Find A Path
+## How To Find A Path
 To find a path, there must be at least two or more [entities](vertices.md) on the graph and a [relationship](edges.md)
 between them. Right click on one entity and choose `FIND PATH` and then click on another entity. Options include limiting
 your results  to a certain number of hops (the number of entities it goes through) and limit it

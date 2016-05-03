@@ -1,4 +1,4 @@
-#<center> Relationships </center>
+# Relationships
 
 Relationships are the associations between [entities](vertices.md). Relationships exist to show connections between two
 different entities.
