@@ -1,6 +1,6 @@
 # Relationships
 
-Relationships are the associations between [entities](vertices.md). Relationships exist to show connections between two
+Relationships are the associations between [entities](entities.md). Relationships exist to show connections between two
 different entities.
 
 For example, through a relationship, you will be able to see that John Smith knows Jane Doe. It provides a more visual

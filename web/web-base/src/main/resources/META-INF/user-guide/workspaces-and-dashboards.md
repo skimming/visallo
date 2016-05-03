@@ -2,9 +2,9 @@
 
 ## Workspaces
 
-A named collection of [entities](vertices.md) and [relationships](edges.md) that can be shared to improve
+A named collection of [entities](entities.md) and [relationships](edges.md) that can be shared to improve
  [collaboration](collaboration.md) with
-other {{ book.productName }} users. New and changed [entities](vertices.md), [properties](properties.md), and [relationships](edges.md)
+other {{ book.productName }} users. New and changed [entities](entities.md), [properties](properties.md), and [relationships](edges.md)
 are only visible within a [workspace](workspaces.md) until it is published by a user with
 the `PUBLISH` [privilege](application-privileges.md).
 

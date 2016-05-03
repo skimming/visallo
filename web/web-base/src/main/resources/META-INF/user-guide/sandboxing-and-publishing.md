@@ -16,12 +16,12 @@ For example, if an image is on the
 `PUBLISH` the title and make it visible to everyone with the same authorization, or `UNDO` the title removing that change
 entirely from even your [workspace](workspaces.md). Changes to the [workspace](workspaces.md) that can be published or
 undone include but are not limited to: adding or deleting [properties](properties.md), [relationships](edges.md), comments,
-[entities](vertices.md), etc.
+[entities](entities.md), etc.
 
 
 ## Modification Panel
 The Modification Panel can be found in the bottom of the graph and it displays all of the changes that exist in the
-[workspace](workspaces.md); each change is listed under the name of the changed [entity](vertices.md)**/**[relationship](edges.md).
+[workspace](workspaces.md); each change is listed under the name of the changed [entity](entities.md)**/**[relationship](edges.md).
 These changes are not visible to any user until the `PUBLISH` option is used, which is only available to those with the
 `EDIT` access to the workspace and the `PUBLISH` privilege as a user. By publishing, all changes are made throughout
 the system.

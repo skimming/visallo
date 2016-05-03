@@ -13,7 +13,7 @@ To view the list of users the workspace is shared with, click on the "Spaces" ic
 <img src = images/workspace-collaboration.png width="400">
 
 After a [workspace](workspaces.md) is shared with you and depending on your access to the [workspace](workspaces.md), you
-can add comments or change the [properties](properties.md) of the [entities](vertices.md) and [relationships](edges.md)
+can add comments or change the [properties](properties.md) of the [entities](entities.md) and [relationships](edges.md)
 for other users to reply to or view.
 
 
@@ -22,7 +22,7 @@ for other users to reply to or view.
 [sandboxing](sandboxing-and-publishing.md).
 
 
-Starting with a [workspace](workspaces.md) that only you have access to, you may create, modify, or delete [entities](vertices.md).
+Starting with a [workspace](workspaces.md) that only you have access to, you may create, modify, or delete [entities](entities.md).
 If changes are made and [published](sandboxing-and-publishing.md) (through the modification panel), those changes are then
 visible to any {{ book.productName }}  user based on
 the visibility attached to the entity and [properties](properties.md). A default [visibility](data-access-control.md)

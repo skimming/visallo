@@ -1,7 +1,7 @@
 # Graph
 
 The [workspace](workspaces.md) graph is the primary method used to visualize and interact with the [relationships](edges.md)
-between [entities](vertices.md); both [entities](vertices.md) and [relationships](edges.md) can be viewed and manipulated
+between [entities](entities.md); both [entities](entities.md) and [relationships](edges.md) can be viewed and manipulated
  on the graph, as well as any paths that are [searched](search.md) for and found.
 
 
@@ -31,7 +31,7 @@ provides you with the options enable/disable Snap to Grid and/or Edge Labels.
   grid. When enabling “Snap To Grid”, all the entities on the graph will align themselves to the nearest intersection of lines on the grid.
   - Edge Labels: Displays the [relationships](edges.md) between entities on the graph.
 
-Placing large numbers of [entities](vertices.md), and [relationships](edges.md)on a graph to can get complicated quickly
+Placing large numbers of [entities](entities.md), and [relationships](edges.md)on a graph to can get complicated quickly
 while at the same time lose the effectiveness of the pictorial layout if not displayed in a meaningful manner.  As a result,
 Visallo offers a few default layout styles to assist in rendering information on a graph.  These include  `Circle`, `Grid`,
 `Hierarchy`, and `Forced Directed`.

@@ -9,9 +9,9 @@ have been granted. You can view your privileges by clicking on your username in 
 
 `READ` : The ability to login and view data (limited by [access control](data-access-control.md))
 
-`COMMENT` : The ability to annotate [entities](vertices.md) and [relationships](edges.md) with threaded comments
+`COMMENT` : The ability to annotate [entities](entities.md) and [relationships](edges.md) with threaded comments
 
-`EDIT` : The ability to create and modify [entities](vertices.md), [relationships](edges.md), and [properties](properties.md)
+`EDIT` : The ability to create and modify [entities](entities.md), [relationships](edges.md), and [properties](properties.md)
 within a [workspace](workspaces.md) [sandbox](sandboxing-and-publishing.md)
 
 `PUBLISH` : The ability to commit and share [workspace](workspaces.md) [sandbox](sandboxing-and-publishing.md) changes

@@ -14,14 +14,14 @@ The vertical bar along the left side of the screen provides access to many of {{
  another workspace, create, delete and/or share a [workspace](workspaces.md) with another user
 
 <img src = images/menubar-graph.png width="30">   Graph
- - Opens the [workspace](workspaces.md) graph to visualize and manage [entities](vertices.md) and [relationships](edges.md).
+ - Opens the [workspace](workspaces.md) graph to visualize and manage [entities](entities.md) and [relationships](edges.md).
 
 <img src = images/menubar-map.png width="30">   Map
- - Opens the [map](map.md) where you can analyze [entities](vertices.md) based on their geo-coordinates.
+ - Opens the [map](map.md) where you can analyze [entities](entities.md) based on their geo-coordinates.
 
 <img src = images/menubar-activity.png width="30">   Activity
  - Opens the activity panel to show the status of your changes to the data as well as [paths](find-path.md)
- found between [entities](vertices.md)
+ found between [entities](entities.md)
 
 <img src = images/menubar-logout.png width="30">  Logout
  - Logs you out of {{ book.productName }} and returns to the user login screen

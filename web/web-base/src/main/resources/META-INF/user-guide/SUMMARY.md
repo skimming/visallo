@@ -1,7 +1,7 @@
 # User Guide Table of Contents
 
 * [{{ book.productName }} Concepts](visallo-data.md)
-    * [Entities](vertices.md)
+    * [Entities](entities.md)
     * [Relationships](edges.md)
     * [Properties](properties.md)
 * [Navigation](navigation.md)

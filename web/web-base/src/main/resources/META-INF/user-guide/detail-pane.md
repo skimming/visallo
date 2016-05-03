@@ -1,6 +1,6 @@
 # Detail Panel
   The primary way to view data in {{book.productName }} is through the Detail Panel which can be found on the right
-   hand side of the screen, when one or more [entities](vertices.md) or [relationships](edges.md) is selected. Depending
+   hand side of the screen, when one or more [entities](entities.md) or [relationships](edges.md) is selected. Depending
    on your [access](data-access-control.md), you may also have the ability to add and/or edit data.
 
 ## Entities Details Panel
@@ -9,11 +9,11 @@
 `Download`.
 
    - `Full Screen`: Opens the the details panel in another tab in fullscreen.
-   - `Original`:  Opens the original entity in its native format. (NOTE: This is for `Raw` [entities](vertices.md) such
+   - `Original`:  Opens the original entity in its native format. (NOTE: This is for `Raw` [entities](entities.md) such
    as Documents, Images, etc.)
-   - `Download`: Downloads the entity on your device. (NOTE: This is for `Raw` [entities](vertices.md) such
+   - `Download`: Downloads the entity on your device. (NOTE: This is for `Raw` [entities](entities.md) such
    as Documents, Images, etc.)
-   - `Previously Viewed`: Provides a list of [entities](vertices.md)**/**[relationships](edges.md) that were
+   - `Previously Viewed`: Provides a list of [entities](entities.md)**/**[relationships](edges.md) that were
    recently viewed.
 
 Options for the `ADD` drop down in the detail panel includes: [`property`](properties.md), `Image`, and `Comment`.
@@ -33,7 +33,7 @@ options may appear, this also applies to `Add` and `Open`.
 
 Options for the `OPEN` drop down includes `Full Screen` and `Previously Viewed`.
    - `Full Screen`: Opens the the details panel in another tab in fullscreen.
-   - `Previously Viewed`: Provides a list of [entities](vertices.md)**/**[relationships](edges.md) that were
+   - `Previously Viewed`: Provides a list of [entities](entities.md)**/**[relationships](edges.md) that were
    recently viewed.
 
 
@@ -48,14 +48,14 @@ options may appear, this also applies to `Add` and `Open`.
 
 ## Multi Selection Histogram
 The Multi Selection Histogram Details Panel has all the statistical information on all the selected
- [entities](vertices.md) and [relationships](edges.md). By clicking on any of the bars on the histogram, detailed information
+ [entities](entities.md) and [relationships](edges.md). By clicking on any of the bars on the histogram, detailed information
  will appear thus narrowing down to a
-single [entity's](vertices.md)**/**[relationship's](edges.md) details panel.
+single [entity's](entities.md)**/**[relationship's](edges.md) details panel.
 
 
 Options for the `OPEN` drop down includes `Full Screen` and `Previously Viewed`.
    - `Full Screen`: Opens the the details panel in another tab in fullscreen.
-   - `Previously Viewed`: Provides a list of [entities](vertices.md)**/**[relationships](edges.md) that were
+   - `Previously Viewed`: Provides a list of [entities](entities.md)**/**[relationships](edges.md) that were
    recently viewed.
 
 <img src = images/multi-selection-histogram.png width="300">

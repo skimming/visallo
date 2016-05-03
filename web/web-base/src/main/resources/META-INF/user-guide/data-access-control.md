@@ -1,6 +1,6 @@
 # Access Control
 
-Access to data in {{ book.productName }} is controlled at the individual [entity](vertices.md), [relationship](edges.md),
+Access to data in {{ book.productName }} is controlled at the individual [entity](entities.md), [relationship](edges.md),
 and [property](properties.md) level. Additionally, there are two concepts that enable data to be protected and users to
  be authorized. `Visibility` allows data to be protected and `authorization` ensures only authorized users can see specific
  sets of data; these terms can be used interchangeably, but its based on the perspective.

@@ -9,9 +9,9 @@ different forms of viewing the data. The different visualizations may include: V
 Subway, Text Overview, and Pie Chart. The different Dashboard Cards that exist by default include:
 
 **Entity Counts**
-   - The Entity Counts dashboard card starts as a Pie Chart view displaying the number of [entities](vertices.md)
+   - The Entity Counts dashboard card starts as a Pie Chart view displaying the number of [entities](entities.md)
    that are in the system for that [workspace](workspaces.md) as per their concept types. If you select a specific
-   “slice”, bar, or portion of the visualization, it will render a list of all the [entities](vertices.md) in that concept type
+   “slice”, bar, or portion of the visualization, it will render a list of all the [entities](entities.md) in that concept type
    and will provide an option to open the list in the [search](search.md) panel. Configurations for this dashboard card
    includes just changing the title and the visualization.
 

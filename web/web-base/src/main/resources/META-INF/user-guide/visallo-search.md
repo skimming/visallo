@@ -40,7 +40,7 @@ To execute a saved search, open the saved search drop down and select a saved se
 a saved search can be found on the [dashboard](dashboards.md).
 
 ## Find Related
-Revealing relationships to entities provides greater insights to your data. To run this feature, select an [entity](vertices.md)
+Revealing relationships to entities provides greater insights to your data. To run this feature, select an [entity](entities.md)
 on the graph, right click to display the menu options and select `Search...`. Then select `Related Items`. The search panel will
 then appear with all the results of all the entities that are related.
 
