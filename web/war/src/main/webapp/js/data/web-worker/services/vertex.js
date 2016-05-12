@@ -93,6 +93,17 @@ define([
             ));
         },
 
+        resolvedTo: function(vertexId, propertyName, propertyKey) {
+            var params = { graphVertexId: vertexId };
+            if (!_.isUndefined(propertyName)) {
+                params.propertyName = propertyName;
+            }
+            if (!_.isUndefined(propertyKey)) {
+                params.propertyKey = propertyKey;
+            }
+            return ajax('GET', '/vertex/resolved-to', params);
+        },
+
         multiple: function(options) {
             return ajax('POST', '/vertex/multiple', options);
         },
