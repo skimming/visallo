@@ -5,10 +5,7 @@ import com.google.inject.Inject;
 import org.vertexium.*;
 import org.visallo.core.exception.VisalloException;
 import org.visallo.core.model.graph.GraphRepository;
-import org.visallo.core.model.ontology.Concept;
-import org.visallo.core.model.ontology.OntologyProperty;
-import org.visallo.core.model.ontology.OntologyRepository;
-import org.visallo.core.model.ontology.Relationship;
+import org.visallo.core.model.ontology.*;
 import org.visallo.core.model.properties.VisalloProperties;
 import org.visallo.core.model.user.UserRepository;
 import org.visallo.core.security.VisibilityTranslator;
@@ -77,92 +74,70 @@ public class IngestRepository {
         this.ontologyRepository = ontologyRepository;
     }
 
-    public boolean validate(ConceptBuilder builder) {
-        return save(builder, false);
+    public List<Element> save(EntityBuilder... builders) {
+        return save(Arrays.asList(builders));
     }
 
-    public boolean validate(RelationshipBuilder builder) {
-        return save(builder, false);
-    }
-
-    public void save(EntityBuilder... builders) {
-        save(Arrays.asList(builders));
-    }
-
-    public void save(Collection<EntityBuilder> builders) {
+    public List<Element> save(Collection<EntityBuilder> builders) {
         LOGGER.debug("Saving %d entities", builders.size());
+
+        // Validate the entities
         for (EntityBuilder builder : builders) {
-            if (builder instanceof ConceptBuilder) {
-                if (!save((ConceptBuilder) builder, false)) {
-                    throw new VisalloException("Concept class: " + builder.getClass().getName() + " failed validation");
-                }
-            } else if (builder instanceof RelationshipBuilder) {
-                if (!save((RelationshipBuilder) builder, false)) {
-                    throw new VisalloException("Relationship class: " + builder.getClass().getName() + " failed validation");
-                }
-            } else {
-                throw new VisalloException("Unexpected type: " + builder.getClass().getName());
+            ValidationResult validationResult = (builder instanceof ConceptBuilder) ?
+                    validateConceptBuilder((ConceptBuilder) builder) :
+                    validateRelationshipBuilder((RelationshipBuilder)builder);
+            if (!validationResult.isValid()) {
+                throw new VisalloException(validationResult.getValidationError());
             }
         }
+
+        // If we got to here, everything must be valid. Save the entities.
+        List<Element> elements = new ArrayList<>();
         for (EntityBuilder builder : builders) {
             if (builder instanceof ConceptBuilder) {
-                save((ConceptBuilder) builder, true);
+                elements.add(save((ConceptBuilder) builder));
             } else {
-                save((RelationshipBuilder) builder, true);
+                elements.add(save((RelationshipBuilder) builder));
             }
         }
+        return elements;
     }
 
     public void flush() {
         graph.flush();
     }
 
-    private boolean save(ConceptBuilder conceptBuilder, boolean save) {
-        boolean valid = verifyConcept(conceptBuilder, save);
-        if (valid) {
-            Visibility conceptVisibility = getVisibility(conceptBuilder.getVisibility());
-            VertexBuilder vertexBuilder = graph.prepareVertex(conceptBuilder.getId(), getTimestamp(conceptBuilder.getTimestamp()), conceptVisibility);
-            vertexBuilder.setProperty(VisalloProperties.CONCEPT_TYPE.getPropertyName(), conceptBuilder.getIri(), conceptVisibility);
+    private Vertex save(ConceptBuilder conceptBuilder) {
+        Visibility conceptVisibility = getVisibility(conceptBuilder.getVisibility());
+        VertexBuilder vertexBuilder = graph.prepareVertex(conceptBuilder.getId(), getTimestamp(conceptBuilder.getTimestamp()), conceptVisibility);
+        vertexBuilder.setProperty(VisalloProperties.CONCEPT_TYPE.getPropertyName(), conceptBuilder.getIri(), conceptVisibility);
 
-            valid = addProperties(vertexBuilder, conceptBuilder, save);
-            if (valid && save) {
-                LOGGER.trace("Saving vertex: %s", vertexBuilder.getVertexId());
-                vertexBuilder.save(getAuthorizations());
-            }
-        }
-        return valid;
+        addProperties(vertexBuilder, conceptBuilder);
+
+        LOGGER.trace("Saving vertex: %s", vertexBuilder.getVertexId());
+        return vertexBuilder.save(getAuthorizations());
     }
 
-    private boolean save(RelationshipBuilder relationshipBuilder, boolean save) {
-        boolean valid = verifyRelationship(relationshipBuilder, save);
-        if (valid) {
-            Visibility relationshipVisibility = getVisibility(relationshipBuilder.getVisibility());
-            EdgeBuilderByVertexId edgeBuilder = graph.prepareEdge(
-                    relationshipBuilder.getId(),
-                    relationshipBuilder.getOutVertexId(),
-                    relationshipBuilder.getInVertexId(),
-                    relationshipBuilder.getIri(),
-                    getTimestamp(relationshipBuilder.getTimestamp()),
-                    relationshipVisibility
-            );
+    private Edge save(RelationshipBuilder relationshipBuilder) {
+        Visibility relationshipVisibility = getVisibility(relationshipBuilder.getVisibility());
+        EdgeBuilderByVertexId edgeBuilder = graph.prepareEdge(
+                relationshipBuilder.getId(),
+                relationshipBuilder.getOutVertexId(),
+                relationshipBuilder.getInVertexId(),
+                relationshipBuilder.getIri(),
+                getTimestamp(relationshipBuilder.getTimestamp()),
+                relationshipVisibility
+        );
 
-            valid = addProperties(edgeBuilder, relationshipBuilder, save);
-            if (valid && save) {
-                LOGGER.trace("Saving edge: %s", edgeBuilder.getEdgeId());
-                edgeBuilder.save(getAuthorizations());
-            }
-        }
-        return valid;
+        addProperties(edgeBuilder, relationshipBuilder);
+
+        LOGGER.trace("Saving edge: %s", edgeBuilder.getEdgeId());
+        return edgeBuilder.save(getAuthorizations());
     }
 
-    private boolean addProperties(ElementBuilder elementBuilder, EntityBuilder entityBuilder, boolean save) {
+    private void addProperties(ElementBuilder elementBuilder, EntityBuilder entityBuilder) {
         for (PropertyAddition<?> propertyAddition : entityBuilder.getPropertyAdditions()) {
             if (propertyAddition.getValue() != null) {
-                boolean valid = verifyClassProperty(entityBuilder, propertyAddition, save);
-                if (!valid) {
-                    return false;
-                }
-
                 elementBuilder.addPropertyValue(
                         propertyAddition.getKey(),
                         propertyAddition.getIri(),
@@ -173,110 +148,117 @@ public class IngestRepository {
                 );
             }
         }
-        return true;
     }
 
-    private boolean verifyConcept(ConceptBuilder builder, boolean save) {
-        if (verifiedClasses.contains(builder.getClass())) {
-            return true;
+    public ValidationResult validateConceptBuilder(ConceptBuilder builder) {
+        if (!verifiedClasses.contains(builder.getClass())) {
+            Concept concept = ontologyRepository.getConceptByIRI(builder.getIri());
+            if (concept == null) {
+                return new ValidationResult("Concept class: " + builder.getClass().getName() + " IRI: " + builder.getIri() + " is invalid");
+            }
+
+            verifiedClasses.add(builder.getClass());
         }
 
-        Concept concept = ontologyRepository.getConceptByIRI(builder.getIri());
-        if (concept == null) {
-            logOrThrowError(save, "Concept class: " + builder.getClass().getName() + " IRI: " + builder.getIri() + " is invalid");
-            return false;
-        }
-
-        verifiedClasses.add(builder.getClass());
-        return true;
+        return validateProperties(builder, builder.getPropertyAdditions());
     }
 
-    private boolean verifyRelationship(RelationshipBuilder builder, boolean save) {
+    public ValidationResult validateRelationshipBuilder(RelationshipBuilder builder) {
         if (verifiedClasses.contains(builder.getClass())) {
-            return true;
+            return ValidationResult.VALID_RESULT;
         }
+
+        Relationship relationship = ontologyRepository.getRelationshipByIRI(builder.getIri());
+        if (relationship == null) {
+            return new ValidationResult("Relationship class: " + builder.getClass().getName() + " IRI: " + builder.getIri() + " is invalid");
+        }
+
+        List<String> domainConceptIRIs = relationship.getDomainConceptIRIs();
+        List<String> rangeConceptIRIs = relationship.getRangeConceptIRIs();
 
         try {
-            Relationship relationship = ontologyRepository.getRelationshipByIRI(builder.getIri());
-            if (relationship == null) {
-                logOrThrowError(save, "Relationship class: " + builder.getClass().getName() + " IRI: " + builder.getIri() + " is invalid");
-                return false;
-            }
-            List<String> domainConceptIRIs = relationship.getDomainConceptIRIs();
-            List<String> rangeConceptIRIs = relationship.getRangeConceptIRIs();
-
             for (Constructor constructor : builder.getClass().getConstructors()) {
                 Class[] parameterTypes = constructor.getParameterTypes();
                 if (parameterTypes.length == 3) {
                     String outConceptIRI = (String) parameterTypes[1].getField("IRI").get(null);
                     if (!domainConceptIRIs.contains(outConceptIRI)) {
-                        logOrThrowError(save, "Out vertex Concept IRI: " + outConceptIRI + " is invalid");
-                        return false;
+                        return new ValidationResult("Out vertex Concept IRI: " + outConceptIRI + " is invalid");
                     }
+
                     String inConceptIRI = (String) parameterTypes[2].getField("IRI").get(null);
                     if (!rangeConceptIRIs.contains(inConceptIRI)) {
-                        logOrThrowError(save, "In vertex Concept IRI: " + inConceptIRI + " is invalid");
-                        return false;
+                        return new ValidationResult("In vertex Concept IRI: " + inConceptIRI + " is invalid");
                     }
                 } else {
                     LOGGER.warn("Unsupported Constructor found: " + constructor.toString());
                 }
             }
-
-            verifiedClasses.add(builder.getClass());
-            return true;
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new VisalloException("Failed to get IRI for in/out Concept class", e);
         }
+
+        verifiedClasses.add(builder.getClass());
+
+        return validateProperties(builder, builder.getPropertyAdditions());
     }
 
-    private boolean verifyClassProperty(EntityBuilder entityBuilder, PropertyAddition propertyAddition, boolean save) {
-        if (verifiedClassProperties.contains(getKey(entityBuilder, propertyAddition))) {
-            return true;
-        }
-
-        OntologyProperty property = ontologyRepository.getPropertyByIRI(propertyAddition.getIri());
-        Class propertyType = PropertyType.getTypeClass(property.getDataType());
-        if (propertyType.equals(BigDecimal.class)) {
-            propertyType = Double.class;
-        }
-        Class<?> valueType = propertyAddition.getValue().getClass();
-
-        if (entityBuilder instanceof ConceptBuilder) {
-            Concept concept = ontologyRepository.getConceptByIRI(entityBuilder.getIri());
-            if (!isPropertyValidForConcept(concept, property)) {
-                logOrThrowError(save, "Property: " + propertyAddition.getIri() + " is invalid for Concept class (or its ancestors): " + entityBuilder.getClass().getName());
-                return false;
-            }
-            if (!valueType.isAssignableFrom(propertyType)) {
-                logOrThrowError(save, "Property: " + propertyAddition.getIri() + " type: " + valueType.getSimpleName() + " is invalid for Concept class: " + entityBuilder.getClass().getName());
-                return false;
-            }
-            verifiedClassProperties.add(getKey(entityBuilder, propertyAddition));
-            return true;
-
-        } else if (entityBuilder instanceof RelationshipBuilder) {
-            Relationship relationship = ontologyRepository.getRelationshipByIRI(entityBuilder.getIri());
-            if (!relationship.getProperties().contains(property)) {
-                logOrThrowError(save, "Property: " + propertyAddition.getIri() + " is invalid for Relationship class: " + entityBuilder.getClass().getName());
-                return false;
-            }
-            if (!valueType.isAssignableFrom(propertyType)) {
-                logOrThrowError(save, "Property: " + propertyAddition.getIri() + " type: " + valueType.getSimpleName() + " is invalid for Relationship class: " + entityBuilder.getClass().getName());
-                return false;
-            }
-            verifiedClassProperties.add(getKey(entityBuilder, propertyAddition));
-            return true;
-
-        } else {
-            throw new VisalloException("Unexpected type: " + entityBuilder.getClass().getName());
-        }
+    private ValidationResult validateProperties(EntityBuilder entityBuilder, Set<PropertyAddition<?>> propertyAdditions) {
+        return propertyAdditions.stream()
+                .map(propertyAddition -> validateProperty(entityBuilder, propertyAddition))
+                .filter(validationResult -> !validationResult.isValid())
+                .findFirst().orElse(ValidationResult.VALID_RESULT);
     }
 
-    private boolean isPropertyValidForConcept(Concept concept, OntologyProperty property) {
-        if (!concept.getProperties().contains(property)) {
-            Concept parentConcept = ontologyRepository.getParentConcept(concept);
-            return parentConcept != null && isPropertyValidForConcept(parentConcept, property);
+    private ValidationResult validateProperty(EntityBuilder entityBuilder, PropertyAddition propertyAddition) {
+        if (!verifiedClassProperties.contains(getKey(entityBuilder, propertyAddition))) {
+            HasOntologyProperties conceptOrRelationship;
+            if (entityBuilder instanceof ConceptBuilder) {
+                conceptOrRelationship = ontologyRepository.getConceptByIRI(entityBuilder.getIri());
+            } else if (entityBuilder instanceof RelationshipBuilder) {
+                conceptOrRelationship = ontologyRepository.getRelationshipByIRI(entityBuilder.getIri());
+            } else {
+                return new ValidationResult("Unexpected type: " + entityBuilder.getClass().getName());
+            }
+
+            if (conceptOrRelationship == null) {
+                return new ValidationResult("Entity: " + entityBuilder.getIri() + " does not exist in the ontology");
+            }
+
+            OntologyProperty property = ontologyRepository.getPropertyByIRI(propertyAddition.getIri());
+            if (property == null) {
+                return new ValidationResult("Property: " + propertyAddition.getIri() + " does not exist in the ontology");
+            }
+
+            if (!isPropertyValidForEntity(conceptOrRelationship, property)) {
+                return new ValidationResult("Property: " + propertyAddition.getIri() + " is invalid for class (or its ancestors): " + entityBuilder.getClass().getName());
+            }
+
+            if (propertyAddition.getValue() != null) {
+                Class<?> valueType = propertyAddition.getValue().getClass();
+                Class propertyType = PropertyType.getTypeClass(property.getDataType());
+                if (propertyType.equals(BigDecimal.class)) {
+                    propertyType = Double.class;
+                }
+                if (!valueType.isAssignableFrom(propertyType)) {
+                    return new ValidationResult("Property: " + propertyAddition.getIri() + " type: " + valueType.getSimpleName() + " is invalid for Relationship class: " + entityBuilder.getClass().getName());
+                }
+
+                verifiedClassProperties.contains(getKey(entityBuilder, propertyAddition));
+            }
+        }
+
+        return ValidationResult.VALID_RESULT;
+    }
+
+    private boolean isPropertyValidForEntity(HasOntologyProperties entity, OntologyProperty property) {
+        if (!entity.getProperties().contains(property)) {
+            if (entity instanceof Concept) {
+                Concept parentConcept = ontologyRepository.getParentConcept((Concept)entity);
+                if (parentConcept != null) {
+                    return isPropertyValidForEntity(parentConcept, property);
+                }
+            }
+            return false;
         }
         return true;
     }
@@ -324,18 +306,35 @@ public class IngestRepository {
         return metadata;
     }
 
-    private void logOrThrowError(boolean save, String message) {
-        if (save) {
-            throw new VisalloException(message);
-        }
-        LOGGER.error(message);
-    }
-
     private Authorizations getAuthorizations() {
         return userRepository.getAuthorizations(getIngestUser());
     }
 
     private User getIngestUser() {
         return userRepository.getSystemUser();
+    }
+
+    public static class ValidationResult {
+        public static final ValidationResult VALID_RESULT = new ValidationResult(true, null);
+
+        private boolean valid = false;
+        private String validationError;
+
+        public ValidationResult(String validationError) {
+            this.validationError = validationError;
+        }
+
+        public ValidationResult(boolean valid, String validationError) {
+            this.valid = valid;
+            this.validationError = validationError;
+        }
+
+        public boolean isValid() {
+            return valid;
+        }
+
+        public String getValidationError() {
+            return validationError;
+        }
     }
 }
