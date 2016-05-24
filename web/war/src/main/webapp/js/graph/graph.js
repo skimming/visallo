@@ -285,7 +285,8 @@ define([
                     },
                     inc = GRID_LAYOUT_X_INCREMENT * cy.zoom() * retina.devicePixelRatio,
                     yinc = GRID_LAYOUT_Y_INCREMENT * cy.zoom() * retina.devicePixelRatio,
-                    width = inc * 4;
+                    width = inc * 4,
+                    firstVertexId;
 
                 if (data.start) {
                     idToCyNode = {};
@@ -295,10 +296,11 @@ define([
 
                     // Sort existing nodes to end, except leave the first
                     // dragging vertex
+                    firstVertexId = data.vertices[0].id;
                     vertices = data.vertices.sort(function(a, b) {
                         var cyA = idToCyNode[a.id], cyB = idToCyNode[b.id];
-                        if (data.vertices[0].id === a.id) return -1;
-                        if (data.vertices[0].id === b.id) return 1;
+                        if (firstVertexId === a.id) return -1;
+                        if (firstVertexId === b.id) return 1;
                         if (cyA.length && !cyB.length) return 1;
                         if (cyB.length && !cyA.length) return -1;
 
@@ -1732,11 +1734,13 @@ define([
         }
 
         this.onWorkspaceLoaded = function(evt, workspace) {
-            this.resetGraph();
             this.isWorkspaceEditable = workspace.editable;
             this.workspaceVertices = workspace.vertices;
             if (workspace.data.vertices.length) {
                 var newWorkspace = !this.previousWorkspace || this.previousWorkspace !== workspace.workspaceId;
+                if (newWorkspace) {
+                    this.resetGraph();
+                }
                 this.addVertices(workspace.data.vertices, {
                     fit: newWorkspace
                 });
