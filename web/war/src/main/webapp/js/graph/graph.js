@@ -1227,7 +1227,32 @@ define([
             });
         };
 
-        this.graphTap = throttle('selection', SELECTION_THROTTLE, function(event) {
+        this.graphTap = function(event) {
+            var self = this;
+
+            if (isDiscontiguousSelectionKeyPressed(event.originalEvent) && event.cyTarget !== event.cy) {
+                if (event.cyTarget.selected()) {
+                    _.defer(function() {
+                        event.cyTarget.unselect();
+                        self.updateVertexSelections(event.cy, event.cyTarget);
+                    });
+                    return;
+                }
+            }
+
+            this.graphTapThrottle(event);
+
+            function isDiscontiguousSelectionKeyPressed(event) {
+                var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+                if (isMac) {
+                    return event.metaKey;
+                } else {
+                    return event.ctrlKey;
+                }
+            }
+        };
+
+        this.graphTapThrottle = throttle('selection', SELECTION_THROTTLE, function(event) {
             this.trigger('defocusPaths');
             this.trigger('defocusVertices');
 
@@ -1734,13 +1759,13 @@ define([
         }
 
         this.onWorkspaceLoaded = function(evt, workspace) {
+            var newWorkspace = !this.previousWorkspace || this.previousWorkspace !== workspace.workspaceId;
             this.isWorkspaceEditable = workspace.editable;
             this.workspaceVertices = workspace.vertices;
+            if (newWorkspace) {
+                this.resetGraph();
+            }
             if (workspace.data.vertices.length) {
-                var newWorkspace = !this.previousWorkspace || this.previousWorkspace !== workspace.workspaceId;
-                if (newWorkspace) {
-                    this.resetGraph();
-                }
                 this.addVertices(workspace.data.vertices, {
                     fit: newWorkspace
                 });
