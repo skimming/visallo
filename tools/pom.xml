@@ -22,6 +22,6 @@
         <module>rdf-import</module>
         <module>reindex</module>
         <module>owl</module>
-        <module>ontology</module>
+        <module>ontology-ingest</module>
     </modules>
 </project>
